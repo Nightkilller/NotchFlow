@@ -3,11 +3,10 @@ import SwiftUI
 // MARK: - Main Editor View
 
 /// The primary window of NotchFlow.
-/// Displays a script editor with a sidebar for script library and a main editing area.
-/// This is a placeholder for Phase 0 — it will be fully implemented in Phase 1.
+/// Provides script authoring, live metrics, library navigation,
+/// and launches the teleprompter reading view.
 struct MainEditorView: View {
-    @SwiftUI.State private var sampleText: String = ""
-    @SwiftUI.State private var scriptTitle: String = "Untitled Script"
+    @StateObject private var viewModel = EditorViewModel()
 
     var body: some View {
         ZStack {
@@ -22,7 +21,7 @@ struct MainEditorView: View {
 
                 // MARK: Main Content
                 HStack(spacing: 0) {
-                    // Sidebar placeholder
+                    // Sidebar
                     sidebar
 
                     Divider()
@@ -31,6 +30,20 @@ struct MainEditorView: View {
                     // Editor area
                     editorArea
                 }
+            }
+            
+            // MARK: Teleprompter Presentation
+            if viewModel.isTeleprompterPresented {
+                TeleprompterView(
+                    viewModel: TeleprompterViewModel(script: viewModel.structuredScript),
+                    onDismiss: {
+                        withAnimation(AnimationConfig.standard) {
+                            viewModel.dismissTeleprompter()
+                        }
+                    }
+                )
+                .transition(.opacity.combined(with: .scale(scale: 0.98)))
+                .zIndex(10)
             }
         }
         .preferredColorScheme(.dark)
@@ -50,15 +63,15 @@ struct MainEditorView: View {
 
             Spacer()
 
-            Text("\(wordCount) words")
+            Text("\(viewModel.wordCount) words")
                 .font(AppTypography.editorCaption)
                 .foregroundStyle(AppColors.secondaryText)
 
-            if !sampleText.isEmpty {
+            if viewModel.wordCount > 0 {
                 Text("·")
                     .foregroundStyle(AppColors.secondaryText)
 
-                Text(estimatedDuration)
+                Text(viewModel.estimatedDurationFormatted)
                     .font(AppTypography.editorCaption)
                     .foregroundStyle(AppColors.secondaryText)
             }
@@ -77,17 +90,32 @@ struct MainEditorView: View {
                 .foregroundStyle(AppColors.primaryText)
                 .padding(.top, AppSpacing.lg)
 
-            // Placeholder script list
+            // Current Active Script
             VStack(alignment: .leading, spacing: AppSpacing.xs) {
-                sidebarItem(title: scriptTitle, isSelected: true)
+                sidebarItem(title: viewModel.scriptTitle, isSelected: true)
             }
+
+            // Quick Actions
+            VStack(alignment: .leading, spacing: AppSpacing.sm) {
+                Button {
+                    viewModel.loadSampleScript()
+                } label: {
+                    HStack(spacing: AppSpacing.xs) {
+                        Image(systemName: "sparkles")
+                        Text("Load Sample Script")
+                    }
+                    .font(AppTypography.smallLabel)
+                    .foregroundStyle(AppColors.accentSecondary)
+                }
+                .buttonStyle(.plain)
+            }
+            .padding(.top, AppSpacing.sm)
 
             Spacer()
 
             // New script button
             Button {
-                scriptTitle = "Untitled Script"
-                sampleText = ""
+                viewModel.createNewScript()
             } label: {
                 HStack(spacing: AppSpacing.sm) {
                     Image(systemName: "plus.circle.fill")
@@ -108,7 +136,7 @@ struct MainEditorView: View {
         HStack(spacing: AppSpacing.sm) {
             Image(systemName: "doc.text")
                 .font(.system(size: 12))
-            Text(title)
+            Text(title.isEmpty ? "Untitled Script" : title)
                 .font(AppTypography.editorBody)
                 .lineLimit(1)
             Spacer()
@@ -128,88 +156,70 @@ struct MainEditorView: View {
 
     private var editorArea: some View {
         VStack(spacing: 0) {
-            // Script title
+            // Script title & Start Teleprompter Button
             HStack {
-                TextField("Script Title", text: $scriptTitle)
+                TextField("Script Title", text: $viewModel.scriptTitle)
                     .textFieldStyle(.plain)
                     .font(AppTypography.editorTitle)
                     .foregroundStyle(AppColors.primaryText)
 
                 Spacer()
 
-                // Start Teleprompter button (placeholder — wired in Phase 2)
+                // Start Teleprompter Button
                 Button {
-                    // Will open NotchPrompterView in Phase 2
-                    AppLogger.app.info("Start Teleprompter tapped — not yet implemented")
+                    withAnimation(AnimationConfig.standard) {
+                        viewModel.startTeleprompter()
+                    }
                 } label: {
                     HStack(spacing: AppSpacing.sm) {
                         Image(systemName: "play.fill")
-                        Text("Start")
+                        Text("Start Teleprompter")
                     }
                     .font(AppTypography.buttonLabel)
                     .foregroundStyle(.white)
                     .padding(.horizontal, AppSpacing.lg)
                     .padding(.vertical, AppSpacing.sm)
-                    .background(AppColors.accent)
+                    .background(viewModel.canStartTeleprompter ? AppColors.accent : AppColors.surfaceBackground)
                     .clipShape(RoundedRectangle(cornerRadius: AppSpacing.cornerRadiusMd))
                 }
                 .buttonStyle(.plain)
-                .disabled(sampleText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
-                .opacity(
-                    sampleText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? 0.5 : 1.0
-                )
+                .disabled(!viewModel.canStartTeleprompter)
+                .opacity(viewModel.canStartTeleprompter ? 1.0 : 0.5)
+                .help(viewModel.canStartTeleprompter ? "Start Teleprompter session" : "Enter some text first to start")
             }
             .padding(.horizontal, AppSpacing.xl)
             .padding(.top, AppSpacing.xl)
             .padding(.bottom, AppSpacing.md)
 
             // Text editor
-            TextEditor(text: $sampleText)
-                .font(AppTypography.editorBody)
-                .foregroundStyle(AppColors.primaryText)
-                .scrollContentBackground(.hidden)
-                .padding(.horizontal, AppSpacing.xl)
-                .padding(.bottom, AppSpacing.lg)
+            ZStack(alignment: .topLeading) {
+                TextEditor(text: $viewModel.rawText)
+                    .font(AppTypography.editorBody)
+                    .foregroundStyle(AppColors.primaryText)
+                    .scrollContentBackground(.hidden)
+                    .padding(.horizontal, AppSpacing.xl)
+                    .padding(.bottom, AppSpacing.lg)
 
-            // Placeholder prompt when empty
-            if sampleText.isEmpty {
-                VStack(spacing: AppSpacing.md) {
-                    Image(systemName: "text.cursor")
-                        .font(.system(size: 40, weight: .light))
-                        .foregroundStyle(AppColors.secondaryText.opacity(0.5))
+                // Placeholder prompt when empty
+                if viewModel.rawText.isEmpty {
+                    VStack(spacing: AppSpacing.md) {
+                        Image(systemName: "text.cursor")
+                            .font(.system(size: 40, weight: .light))
+                            .foregroundStyle(AppColors.secondaryText.opacity(0.5))
 
-                    Text("Paste or type your script here")
-                        .font(AppTypography.editorBody)
-                        .foregroundStyle(AppColors.secondaryText)
+                        Text("Paste or type your script here")
+                            .font(AppTypography.editorBody)
+                            .foregroundStyle(AppColors.secondaryText)
 
-                    Text("You can also import TXT, PDF, or Markdown files")
-                        .font(AppTypography.editorCaption)
-                        .foregroundStyle(AppColors.secondaryText.opacity(0.7))
+                        Text("You can also import TXT, PDF, or Markdown files, or click 'Load Sample Script'")
+                            .font(AppTypography.editorCaption)
+                            .foregroundStyle(AppColors.secondaryText.opacity(0.7))
+                    }
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .allowsHitTesting(false)
                 }
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .allowsHitTesting(false)
             }
         }
         .background(AppColors.primaryBackground)
     }
-
-    // MARK: - Computed Properties
-
-    private var wordCount: Int {
-        sampleText
-            .split(whereSeparator: { $0.isWhitespace || $0.isNewline })
-            .count
-    }
-
-    private var estimatedDuration: String {
-        let wpm = 150.0
-        let minutes = Double(wordCount) / wpm
-        if minutes < 1 {
-            return "< 1 min"
-        } else {
-            return String(format: "~%.0f min", minutes.rounded())
-        }
-    }
 }
-
-// Note: #Preview requires Xcode. Test by running: swift run NotchFlow
