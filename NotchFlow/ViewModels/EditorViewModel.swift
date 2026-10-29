@@ -1,10 +1,12 @@
 import Foundation
 import Combine
+import AppKit
+import UniformTypeIdentifiers
 
 // MARK: - Editor View Model
 
 /// Manages script editing state, live metrics calculation, text structuring,
-/// and teleprompter presentation transitions.
+/// document import (TXT, Markdown, PDF), and teleprompter presentation transitions.
 @MainActor
 final class EditorViewModel: ObservableObject {
     
@@ -24,6 +26,8 @@ final class EditorViewModel: ObservableObject {
     
     @Published private(set) var structuredScript: Script
     @Published var isTeleprompterPresented: Bool = false
+    @Published var errorMessage: String?
+    @Published var showErrorAlert: Bool = false
     
     // MARK: - Initialization
     
@@ -85,6 +89,40 @@ final class EditorViewModel: ObservableObject {
         You can adjust reading speed, font size, line spacing, or switch to manual keyboard control at any time using simple arrow keys.
         """
         rebuildStructuredScript()
+    }
+    
+    // MARK: - Document Import
+    
+    func presentOpenPanel() {
+        let panel = NSOpenPanel()
+        panel.canChooseFiles = true
+        panel.canChooseDirectories = false
+        panel.allowsMultipleSelection = false
+        panel.allowedContentTypes = [
+            .plainText,
+            .pdf,
+            UTType(filenameExtension: "md") ?? .plainText,
+            UTType(filenameExtension: "markdown") ?? .plainText
+        ]
+        panel.prompt = "Import"
+        panel.message = "Choose a TXT, Markdown, or PDF script to import"
+        
+        if panel.runModal() == .OK, let selectedURL = panel.url {
+            importDocument(from: selectedURL)
+        }
+    }
+    
+    func importDocument(from url: URL) {
+        do {
+            let (importedTitle, importedText) = try ScriptImportService.importDocument(from: url)
+            self.scriptTitle = importedTitle
+            self.rawText = importedText
+            rebuildStructuredScript()
+        } catch {
+            self.errorMessage = error.localizedDescription
+            self.showErrorAlert = true
+            AppLogger.import_.error("Import failed: \(error.localizedDescription)")
+        }
     }
     
     func startTeleprompter(mode: NotchWindowState = .expanded) {

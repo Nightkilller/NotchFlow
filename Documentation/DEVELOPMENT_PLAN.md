@@ -19,8 +19,8 @@ This plan records milestones, implementation phases, verification results, known
 | **Phase 1** | **Application Foundation** | ✅ Completed | Clean build (`swift build`), 26 unit tests passed |
 | **Phase 2** | **Notch Window Management** | ✅ Completed | Clean build (`swift build`), 31 unit tests passed |
 | **Phase 3** | **Script Rendering & Highlighting** | ✅ Completed | Clean build (`swift build`), 35 unit tests passed |
-| **Phase 4** | **Document Import** | 🔲 Next | - |
-| **Phase 5** | **Speech Recognition** | 🔲 Planned | - |
+| **Phase 4** | **Document Import** | ✅ Completed | Clean build (`swift build`), 45 unit tests passed |
+| **Phase 5** | **Speech Recognition** | 🔲 Next | - |
 | **Phase 6** | **Script Synchronization** | 🔲 Planned | - |
 | **Phase 7** | **Voice-Paced Reading & Timer** | 🔲 Planned | - |
 | **Phase 8** | **Persistence & Script Library** | 🔲 Planned | - |

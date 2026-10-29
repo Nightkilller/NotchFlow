@@ -71,6 +71,11 @@ struct MainEditorView: View {
             }
         }
         .preferredColorScheme(.dark)
+        .alert("Document Import", isPresented: $viewModel.showErrorAlert) {
+            Button("OK", role: .cancel) { }
+        } message: {
+            Text(viewModel.errorMessage ?? "An error occurred while importing the document.")
+        }
     }
 
     // MARK: - Title Bar
@@ -121,6 +126,19 @@ struct MainEditorView: View {
 
             // Quick Actions
             VStack(alignment: .leading, spacing: AppSpacing.sm) {
+                Button {
+                    viewModel.presentOpenPanel()
+                } label: {
+                    HStack(spacing: AppSpacing.xs) {
+                        Image(systemName: "square.and.arrow.down")
+                        Text("Import Document...")
+                    }
+                    .font(AppTypography.smallLabel)
+                    .foregroundStyle(AppColors.primaryText)
+                }
+                .buttonStyle(.plain)
+                .help("Import TXT, PDF, or Markdown file")
+                
                 Button {
                     viewModel.loadSampleScript()
                 } label: {
