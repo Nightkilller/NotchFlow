@@ -87,15 +87,17 @@ final class EditorViewModel: ObservableObject {
         rebuildStructuredScript()
     }
     
-    func startTeleprompter() {
+    func startTeleprompter(mode: NotchWindowState = .expanded) {
         guard canStartTeleprompter else { return }
         // Ensure structured script is fresh
         rebuildStructuredScript()
         isTeleprompterPresented = true
+        NotchWindowController.shared.present(with: structuredScript, initialMode: mode)
     }
     
     func dismissTeleprompter() {
         isTeleprompterPresented = false
+        NotchWindowController.shared.dismiss()
     }
     
     // MARK: - Internal

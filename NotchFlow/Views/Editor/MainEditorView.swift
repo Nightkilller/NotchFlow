@@ -32,17 +32,41 @@ struct MainEditorView: View {
                 }
             }
             
-            // MARK: Teleprompter Presentation
+            // MARK: Active Session Banner
             if viewModel.isTeleprompterPresented {
-                TeleprompterView(
-                    viewModel: TeleprompterViewModel(script: viewModel.structuredScript),
-                    onDismiss: {
-                        withAnimation(AnimationConfig.standard) {
+                VStack {
+                    HStack(spacing: AppSpacing.md) {
+                        Circle()
+                            .fill(AppColors.accent)
+                            .frame(width: 8, height: 8)
+                        
+                        Text("Notch Teleprompter Active")
+                            .font(AppTypography.settingsLabel)
+                            .foregroundStyle(AppColors.primaryText)
+                        
+                        Spacer()
+                        
+                        Button("Stop Teleprompter") {
                             viewModel.dismissTeleprompter()
                         }
+                        .buttonStyle(.plain)
+                        .font(AppTypography.buttonLabel)
+                        .foregroundStyle(AppColors.accent)
                     }
-                )
-                .transition(.opacity.combined(with: .scale(scale: 0.98)))
+                    .padding(.horizontal, AppSpacing.lg)
+                    .padding(.vertical, AppSpacing.sm)
+                    .background(AppColors.secondaryBackground)
+                    .clipShape(RoundedRectangle(cornerRadius: AppSpacing.cornerRadiusMd))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: AppSpacing.cornerRadiusMd)
+                            .stroke(AppColors.border, lineWidth: 1)
+                    )
+                    .padding(AppSpacing.lg)
+                    .shadow(radius: 8)
+                    
+                    Spacer()
+                }
+                .transition(.move(edge: .top).combined(with: .opacity))
                 .zIndex(10)
             }
         }
