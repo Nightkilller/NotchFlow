@@ -100,28 +100,38 @@ final class ScriptMatchingService: @unchecked Sendable {
         
         guard startIndex <= endIndex else { return nil }
         
-        let lastToken = recentTokens.last!
         var bestIndex: Int?
         var bestScore: Int = -1
         
-        // Scan the bounded window
-        for i in startIndex...endIndex {
-            if TextNormalizationService.wordsMatch(scriptWords[i].text, lastToken) {
-                // Verify preceding tokens if available
-                var score = 1
-                for offset in 1..<recentTokens.count {
-                    let scriptIdx = i - offset
-                    let tokenIdx = recentTokens.count - 1 - offset
-                    guard scriptIdx >= 0 && tokenIdx >= 0 else { break }
-                    if TextNormalizationService.wordsMatch(scriptWords[scriptIdx].text, recentTokens[tokenIdx]) {
-                        score += 1
+        // Check recent tokens from newest to oldest (up to 3 tokens back).
+        // This ensures trailing filler words ("um", "uh", "like") or partial words
+        // do not block advancement when earlier words in the spoken phrase matched accurately.
+        for tokenOffset in 0..<min(3, recentTokens.count) {
+            let tokenIdx = recentTokens.count - 1 - tokenOffset
+            let token = recentTokens[tokenIdx]
+            
+            for i in startIndex...endIndex {
+                if TextNormalizationService.wordsMatch(scriptWords[i].text, token) {
+                    var score = 1
+                    for prevOffset in 1...tokenIdx {
+                        let scriptIdx = i - prevOffset
+                        let prevTokenIdx = tokenIdx - prevOffset
+                        guard scriptIdx >= 0 else { break }
+                        if TextNormalizationService.wordsMatch(scriptWords[scriptIdx].text, recentTokens[prevTokenIdx]) {
+                            score += 1
+                        }
+                    }
+                    
+                    if score > bestScore {
+                        bestScore = score
+                        bestIndex = i
                     }
                 }
-                
-                if score > bestScore {
-                    bestScore = score
-                    bestIndex = i
-                }
+            }
+            
+            // If we found a confident multi-word match, stop looking further back
+            if bestScore >= 2 {
+                break
             }
         }
         

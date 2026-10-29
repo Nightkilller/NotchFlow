@@ -25,6 +25,32 @@ struct ReadingSettings: Sendable, Equatable, Codable {
     var countdownSeconds: Int = 3
     /// The reading mode.
     var readingMode: ReadingMode = .voicePaced
+    /// The local speech recognition engine used for voice-paced synchronization.
+    var speechEngine: SpeechEngineType = .whisper
+    /// Whether to display the live development debug HUD panel.
+    var showDebugHUD: Bool = false
+}
+
+// MARK: - Speech Engine Type
+
+/// The local speech recognition engine used for real-time script synchronization.
+enum SpeechEngineType: String, Sendable, Codable, CaseIterable, Identifiable {
+    /// Local open-source whisper.cpp inference with Apple Silicon Metal acceleration.
+    case whisper = "Local Whisper (M4 Metal)"
+    /// Native Apple Dictation / Speech Recognition engine.
+    case appleSpeech = "Apple Speech (On-Device)"
+    /// Voice energy cadence pacing fallback.
+    case audioCadence = "Voice Energy Cadence"
+
+    var id: String { rawValue }
+
+    var description: String {
+        switch self {
+        case .whisper: "Free local whisper.cpp powered by Apple Silicon M4 GPU (100% offline & private)"
+        case .appleSpeech: "Apple Neural Engine on-device speech dictation"
+        case .audioCadence: "Advances text at selected speed whenever voice activity is detected"
+        }
+    }
 }
 
 // MARK: - Reading Mode

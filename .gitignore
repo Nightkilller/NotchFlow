@@ -9,6 +9,10 @@ DerivedData/
 *.xcodeproj/xcuserdata/
 *.xcworkspace/xcuserdata/
 
+# Large Model Weights (Downloaded on demand via scripts/download_model.sh)
+Models/*.bin
+*.bin
+
 # macOS
 .DS_Store
 .AppleDouble

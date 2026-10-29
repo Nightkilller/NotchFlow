@@ -82,14 +82,18 @@ final class SpeechPermissionService: ObservableObject {
             micGranted = await AVCaptureDevice.requestAccess(for: .audio)
         }
         
-        // Request Speech Recognition
-        let speechGranted = await withCheckedContinuation { continuation in
+        // Request Speech Recognition via nonisolated helper to avoid actor isolation check on background callback
+        let speechGranted = await Self.requestSpeechAuthorization()
+        
+        checkCurrentStatus()
+        return micGranted && speechGranted
+    }
+    
+    nonisolated private static func requestSpeechAuthorization() async -> Bool {
+        await withCheckedContinuation { continuation in
             SFSpeechRecognizer.requestAuthorization { status in
                 continuation.resume(returning: status == .authorized)
             }
         }
-        
-        checkCurrentStatus()
-        return micGranted && speechGranted
     }
 }

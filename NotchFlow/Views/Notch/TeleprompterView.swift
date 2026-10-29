@@ -5,12 +5,53 @@ import SwiftUI
 /// The primary teleprompter display window featuring word-level visual synchronization,
 /// auto-scrolling viewport, playback controls, reading guide line, mirror mode,
 /// pre-start countdown, and keyboard navigation.
+///
+/// Features:
+/// - Compact 2-Line Notch Attachment: Seamlessly attaches flush beneath the MacBook camera notch,
+///   showing only 2 lines (active line + upcoming line) in a hidden-like unobtrusive presentation.
+/// - Automatic Line-by-Line Advance: When a line completes in word wrap, it automatically glides to the next line.
+/// - Hover Expansion: Hovering the cursor over the notch expands the full prompter controls HUD.
 struct TeleprompterView: View {
     @ObservedObject var viewModel: TeleprompterViewModel
+    @ObservedObject private var windowController = NotchWindowController.shared
     let onDismiss: () -> Void
     var onCollapse: (() -> Void)? = nil
     
     @SwiftUI.State private var showControlsHUD: Bool = true
+    
+    private var isExpanded: Bool {
+        windowController.isHoverExpanded || windowController.isPinnedExpanded
+    }
+    
+    private var notchTopOffset: CGFloat {
+        let notchInfo = DisplayGeometryService.shared.currentNotchInfo
+        return notchInfo.hasNotch ? notchInfo.topSafeAreaHeight : 6
+    }
+    
+    private var compactFontSize: CGFloat {
+        18
+    }
+    
+    private var allWords: [ScriptWord] {
+        viewModel.script.allWords
+    }
+    
+    private var lines: [ScriptLine] {
+        let maxWidth = viewModel.settings.readingAreaWidth - 48
+        let fontSize = isExpanded ? viewModel.settings.fontSize : compactFontSize
+        return ScriptLineWrapService.computeLines(
+            words: allWords,
+            maxWidth: maxWidth,
+            fontSize: fontSize
+        )
+    }
+    
+    private var activeLineIndex: Int {
+        ScriptLineWrapService.activeLineIndex(
+            for: viewModel.position.currentWordIndex,
+            in: lines
+        )
+    }
     
     var body: some View {
         ZStack {
@@ -18,61 +59,17 @@ struct TeleprompterView: View {
             AppColors.primaryBackground
                 .ignoresSafeArea()
             
-            VStack(spacing: 0) {
-                // MARK: Header Bar
-                headerBar
-                
-                Divider()
-                    .background(AppColors.divider)
-                
-                // Status message banner (e.g. mic permission notice or error)
-                if let msg = viewModel.statusMessage {
-                    HStack(spacing: 6) {
-                        Image(systemName: "exclamationmark.triangle.fill")
-                            .font(.system(size: 11))
-                            .foregroundStyle(.yellow)
-                        Text(msg)
-                            .font(AppTypography.smallLabel)
-                            .foregroundStyle(AppColors.primaryText)
-                            .lineLimit(1)
-                        Spacer()
-                        Button {
-                            viewModel.statusMessage = nil
-                        } label: {
-                            Image(systemName: "xmark")
-                                .font(.system(size: 9))
-                                .foregroundStyle(AppColors.secondaryText)
-                        }
-                        .buttonStyle(.plain)
-                    }
-                    .padding(.horizontal, AppSpacing.lg)
-                    .padding(.vertical, 4)
-                    .background(Color.yellow.opacity(0.15))
-                }
-                
-                // MARK: Reading Surface
-                ZStack {
-                    readingSurface
-                    
-                    // Reading Guide Line Overlay (Eye-level anchor)
-                    if viewModel.settings.showReadingGuide {
-                        readingGuideLine
-                    }
-                    
-                    // Countdown Overlay (3... 2... 1... Speak!)
-                    if let remaining = viewModel.countdownRemaining {
-                        countdownOverlay(seconds: remaining)
-                    }
-                }
-                
-                Divider()
-                    .background(AppColors.divider)
-                
-                // MARK: Bottom HUD Controls
-                controlsHUD
+            if isExpanded {
+                expandedPrompterContent
+            } else {
+                compactTwoLineView
             }
         }
         .preferredColorScheme(.dark)
+        // Expand controls when mouse hovers over the notch teleprompter, collapse when it leaves
+        .onHover { isHovered in
+            windowController.setHovered(isHovered)
+        }
         // Global keyboard handling for prompter navigation
         .background(
             KeyboardNavigationHelper(
@@ -86,21 +83,151 @@ struct TeleprompterView: View {
                 onSpeedUp: { viewModel.updateSpeed(delta: 10) },
                 onSpeedDown: { viewModel.updateSpeed(delta: -10) },
                 onFontGrow: { viewModel.updateFontSize(delta: 2) },
-                onFontShrink: { viewModel.updateFontSize(delta: -2) }
+                onFontShrink: { viewModel.updateFontSize(delta: -2) },
+                onToggleDebug: { viewModel.settings.showDebugHUD.toggle() }
             )
         )
     }
     
-    private var notchTopOffset: CGFloat {
-        let notchInfo = DisplayGeometryService.shared.currentNotchInfo
-        return notchInfo.hasNotch ? notchInfo.topSafeAreaHeight : 8
+    // MARK: - Compact 2-Line Notch Attachment View
+    
+    private var compactTwoLineView: some View {
+        let linesList = self.lines
+        let currentIdx = self.activeLineIndex
+        let currentLine = linesList.indices.contains(currentIdx) ? linesList[currentIdx] : nil
+        let nextLine = linesList.indices.contains(currentIdx + 1) ? linesList[currentIdx + 1] : nil
+        
+        return VStack(alignment: .leading, spacing: 4) {
+            // Line 1: Active Reading Line
+            if let current = currentLine {
+                HStack(spacing: 6) {
+                    ForEach(current.words) { word in
+                        WordHighlightView(
+                            word: word,
+                            state: viewModel.visualState(for: word),
+                            fontSize: compactFontSize,
+                            onTap: { viewModel.jumpToWord(at: word.globalIndex) }
+                        )
+                        .id(word.id)
+                    }
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .transition(.asymmetric(
+                    insertion: .move(edge: .bottom).combined(with: .opacity),
+                    removal: .move(edge: .top).combined(with: .opacity)
+                ))
+                .id("compact-line-\(current.id)")
+            } else {
+                Text(viewModel.script.title)
+                    .font(AppTypography.teleprompterFont(size: compactFontSize))
+                    .foregroundStyle(AppColors.secondaryText)
+            }
+            
+            // Line 2: Upcoming Next Line
+            if let next = nextLine {
+                HStack(spacing: 6) {
+                    ForEach(next.words) { word in
+                        WordHighlightView(
+                            word: word,
+                            state: viewModel.visualState(for: word),
+                            fontSize: compactFontSize,
+                            onTap: { viewModel.jumpToWord(at: word.globalIndex) }
+                        )
+                        .id(word.id)
+                    }
+                }
+                .opacity(0.65)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .transition(.asymmetric(
+                    insertion: .move(edge: .bottom).combined(with: .opacity),
+                    removal: .move(edge: .top).combined(with: .opacity)
+                ))
+                .id("compact-line-\(next.id)")
+            } else {
+                HStack(spacing: 4) {
+                    Text("• End of Script •")
+                        .font(.system(size: 11, weight: .medium, design: .rounded))
+                        .foregroundStyle(AppColors.secondaryText.opacity(0.45))
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+            }
+        }
+        .padding(.horizontal, AppSpacing.xl)
+        .padding(.top, notchTopOffset + 2)
+        .padding(.bottom, 6)
+        .animation(.spring(response: 0.32, dampingFraction: 0.86), value: currentIdx)
+    }
+    
+    // MARK: - Expanded Prompter Content
+    
+    private var expandedPrompterContent: some View {
+        VStack(spacing: 0) {
+            // Header Bar
+            headerBar
+            
+            Divider()
+                .background(AppColors.divider)
+            
+            // Status message banner
+            if let msg = viewModel.statusMessage {
+                HStack(spacing: 6) {
+                    Image(systemName: "exclamationmark.triangle.fill")
+                        .font(.system(size: 11))
+                        .foregroundStyle(.yellow)
+                    Text(msg)
+                        .font(AppTypography.smallLabel)
+                        .foregroundStyle(AppColors.primaryText)
+                        .lineLimit(1)
+                    Spacer()
+                    Button {
+                        viewModel.statusMessage = nil
+                    } label: {
+                        Image(systemName: "xmark")
+                            .font(.system(size: 9))
+                            .foregroundStyle(AppColors.secondaryText)
+                    }
+                    .buttonStyle(.plain)
+                }
+                .padding(.horizontal, AppSpacing.lg)
+                .padding(.vertical, 4)
+                .background(Color.yellow.opacity(0.15))
+            }
+            
+            // Reading Surface
+            ZStack {
+                readingSurface
+                
+                // Reading Guide Line Overlay
+                if viewModel.settings.showReadingGuide {
+                    readingGuideLine
+                }
+                
+                // Countdown Overlay (3... 2... 1... Speak!)
+                if let remaining = viewModel.countdownRemaining {
+                    countdownOverlay(seconds: remaining)
+                }
+            }
+            
+            Divider()
+                .background(AppColors.divider)
+            
+            // Bottom HUD Controls
+            controlsHUD
+            
+            // Debug HUD Overlay
+            if viewModel.settings.showDebugHUD {
+                TeleprompterDebugView(viewModel: viewModel)
+                    .padding(.horizontal, AppSpacing.lg)
+                    .padding(.bottom, 6)
+                    .transition(.move(edge: .bottom).combined(with: .opacity))
+            }
+        }
     }
     
     // MARK: - Header Bar
     
     private var headerBar: some View {
         HStack {
-            // Script Title
             Text(viewModel.script.title)
                 .font(AppTypography.settingsHeading)
                 .foregroundStyle(AppColors.primaryText)
@@ -169,6 +296,30 @@ struct TeleprompterView: View {
             .background(AppColors.surfaceBackground)
             .clipShape(RoundedRectangle(cornerRadius: AppSpacing.cornerRadiusSm))
             
+            // Debug HUD Button
+            Button {
+                viewModel.settings.showDebugHUD.toggle()
+            } label: {
+                Image(systemName: viewModel.settings.showDebugHUD ? "wrench.and.screwdriver.fill" : "wrench.and.screwdriver")
+                    .font(.system(size: 11, weight: .semibold))
+                    .foregroundStyle(viewModel.settings.showDebugHUD ? AppColors.accent : AppColors.secondaryText)
+                    .frame(width: 24, height: 24)
+            }
+            .buttonStyle(.plain)
+            .help("Toggle Alignment & Whisper Debug HUD (D)")
+            
+            // Pin / Lock Expanded Button
+            Button {
+                windowController.togglePinExpanded()
+            } label: {
+                Image(systemName: windowController.isPinnedExpanded ? "pin.fill" : "pin")
+                    .font(.system(size: 11, weight: .semibold))
+                    .foregroundStyle(windowController.isPinnedExpanded ? AppColors.accent : AppColors.secondaryText)
+                    .frame(width: 24, height: 24)
+            }
+            .buttonStyle(.plain)
+            .help(windowController.isPinnedExpanded ? "Unpin (Auto-collapse to 2 lines when cursor leaves)" : "Pin Controls Expanded")
+            
             // Collapse Button (if hosted inside notch container)
             if let onCollapse = onCollapse {
                 Button {
@@ -206,25 +357,40 @@ struct TeleprompterView: View {
     private var readingSurface: some View {
         ScrollViewReader { proxy in
             ScrollView(.vertical, showsIndicators: false) {
-                LazyVStack(alignment: .leading, spacing: AppSpacing.lg) {
-                    // Top breathing space
+                LazyVStack(alignment: .leading, spacing: 10) {
                     Spacer()
                         .frame(height: 24)
                     
-                    ForEach(viewModel.script.sections) { section in
-                        sectionView(section)
+                    ForEach(lines) { line in
+                        HStack(spacing: 6) {
+                            ForEach(line.words) { word in
+                                WordHighlightView(
+                                    word: word,
+                                    state: viewModel.visualState(for: word),
+                                    fontSize: viewModel.settings.fontSize,
+                                    onTap: {
+                                        viewModel.jumpToWord(at: word.globalIndex)
+                                    }
+                                )
+                                .id(word.id)
+                            }
+                        }
+                        .id("expanded-line-\(line.id)")
+                        .padding(.horizontal, AppSpacing.sm)
+                        .padding(.vertical, 2)
+                        .background(
+                            RoundedRectangle(cornerRadius: AppSpacing.cornerRadiusSm)
+                                .fill(line.id == activeLineIndex ? AppColors.surfaceBackground.opacity(0.4) : Color.clear)
+                        )
                     }
                     
-                    // Bottom padding for comfortable scrolling
                     Spacer()
                         .frame(height: 100)
                 }
                 .padding(.horizontal, AppSpacing.xl)
                 .frame(maxWidth: .infinity, alignment: .leading)
-                // Mirror / Flip text horizontally if enabled
                 .scaleEffect(x: viewModel.settings.mirrorText ? -1 : 1, y: 1)
             }
-            // Soft cinematic fade at top and bottom edges
             .mask(
                 LinearGradient(
                     stops: [
@@ -237,49 +403,13 @@ struct TeleprompterView: View {
                     endPoint: .bottom
                 )
             )
-            // Smoothly auto-scroll when active sentence changes
-            .onChange(of: viewModel.currentSentenceId) { _, sentenceId in
-                if let id = sentenceId {
-                    withAnimation(AnimationConfig.viewportScroll) {
-                        proxy.scrollTo(id, anchor: .center)
-                    }
+            // Smoothly auto-scroll line-by-line as active line progresses
+            .onChange(of: activeLineIndex) { _, lineIdx in
+                withAnimation(AnimationConfig.viewportScroll) {
+                    proxy.scrollTo("expanded-line-\(lineIdx)", anchor: .center)
                 }
             }
         }
-    }
-    
-    private func sectionView(_ section: ScriptSection) -> some View {
-        VStack(alignment: .leading, spacing: AppSpacing.md) {
-            ForEach(section.sentences) { sentence in
-                sentenceFlowView(sentence)
-                    .id(sentence.id)
-            }
-        }
-    }
-    
-    private func sentenceFlowView(_ sentence: ScriptSentence) -> some View {
-        let isCurrent = viewModel.isCurrentSentence(sentence)
-        
-        return FlowLayout(spacing: AppSpacing.sm) {
-            ForEach(sentence.words) { word in
-                WordHighlightView(
-                    word: word,
-                    state: viewModel.visualState(for: word),
-                    fontSize: viewModel.settings.fontSize,
-                    onTap: {
-                        viewModel.jumpToWord(at: word.globalIndex)
-                    }
-                )
-                .id(word.id)
-            }
-        }
-        .padding(.horizontal, AppSpacing.sm)
-        .padding(.vertical, AppSpacing.xs)
-        .background(
-            RoundedRectangle(cornerRadius: AppSpacing.cornerRadiusMd)
-                .fill(isCurrent ? AppColors.surfaceBackground.opacity(0.65) : Color.clear)
-        )
-        .animation(AnimationConfig.standard, value: isCurrent)
     }
     
     // MARK: - Reading Guide Line (Eye-Level)
@@ -369,6 +499,64 @@ struct TeleprompterView: View {
             }
             .frame(height: 4)
             .padding(.horizontal, AppSpacing.lg)
+            
+            // Voice Activity Cadence Meter & Live Feedback
+            if viewModel.settings.readingMode == .voicePaced && viewModel.isPlaying {
+                HStack(spacing: 8) {
+                    HStack(spacing: 5) {
+                        Circle()
+                            .fill(viewModel.isSpeaking ? Color.green : Color.orange)
+                            .frame(width: 7, height: 7)
+                            .scaleEffect(viewModel.isSpeaking ? 1.3 : 1.0)
+                            .animation(.spring(response: 0.2), value: viewModel.isSpeaking)
+                        
+                        Text(viewModel.isSpeaking ? "Speaking" : "Paused (Speak to advance)")
+                            .font(.system(size: 11, weight: .semibold, design: .rounded))
+                            .foregroundStyle(viewModel.isSpeaking ? Color.green : AppColors.secondaryText)
+                    }
+                    
+                    // Reactive audio level bar
+                    GeometryReader { barGeo in
+                        ZStack(alignment: .leading) {
+                            Capsule()
+                                .fill(AppColors.surfaceBackground)
+                                .frame(height: 4)
+                            Capsule()
+                                .fill(viewModel.isSpeaking ? Color.green : AppColors.accent)
+                                .frame(width: max(4, barGeo.size.width * CGFloat(viewModel.audioLevel)), height: 4)
+                                .animation(.easeOut(duration: 0.08), value: viewModel.audioLevel)
+                        }
+                    }
+                    .frame(width: 48, height: 4)
+                    
+                    if !viewModel.latestTranscript.isEmpty {
+                        Text("• \"\(viewModel.latestTranscript)\"")
+                            .font(.system(size: 11, weight: .regular, design: .rounded))
+                            .foregroundStyle(AppColors.secondaryText)
+                            .lineLimit(1)
+                            .truncationMode(.head)
+                    }
+                }
+                .padding(.horizontal, AppSpacing.sm)
+                .padding(.vertical, 3)
+                .background(AppColors.surfaceBackground.opacity(0.85))
+                .clipShape(Capsule())
+            } else if viewModel.isListening && !viewModel.latestTranscript.isEmpty {
+                HStack(spacing: 6) {
+                    Image(systemName: "waveform")
+                        .font(.system(size: 10, weight: .semibold))
+                        .foregroundStyle(AppColors.accent)
+                    Text("Heard: \"\(viewModel.latestTranscript)\"")
+                        .font(.system(size: 11, weight: .medium, design: .rounded))
+                        .foregroundStyle(AppColors.primaryText)
+                        .lineLimit(1)
+                        .truncationMode(.head)
+                }
+                .padding(.horizontal, AppSpacing.sm)
+                .padding(.vertical, 2)
+                .background(AppColors.surfaceBackground.opacity(0.85))
+                .clipShape(Capsule())
+            }
             
             // Primary Controls Row
             HStack {
@@ -469,52 +657,6 @@ struct TeleprompterView: View {
     }
 }
 
-// MARK: - Flow Layout for Word Wrapping
-
-/// A simple flow layout wrapping word tokens across multiple lines natively.
-struct FlowLayout: Layout {
-    var spacing: CGFloat = 8
-    
-    func sizeThatFits(proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) -> CGSize {
-        let width = proposal.width ?? 600
-        var height: CGFloat = 0
-        var currentX: CGFloat = 0
-        var currentY: CGFloat = 0
-        var lineHeight: CGFloat = 0
-        
-        for subview in subviews {
-            let size = subview.sizeThatFits(.unspecified)
-            if currentX + size.width > width && currentX > 0 {
-                currentX = 0
-                currentY += lineHeight + spacing
-                lineHeight = 0
-            }
-            currentX += size.width + spacing
-            lineHeight = max(lineHeight, size.height)
-        }
-        height = currentY + lineHeight
-        return CGSize(width: width, height: height)
-    }
-    
-    func placeSubviews(in bounds: CGRect, proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) {
-        var currentX = bounds.minX
-        var currentY = bounds.minY
-        var lineHeight: CGFloat = 0
-        
-        for subview in subviews {
-            let size = subview.sizeThatFits(.unspecified)
-            if currentX + size.width > bounds.maxX && currentX > bounds.minX {
-                currentX = bounds.minX
-                currentY += lineHeight + spacing
-                lineHeight = 0
-            }
-            subview.place(at: CGPoint(x: currentX, y: currentY), proposal: ProposedViewSize(size))
-            currentX += size.width + spacing
-            lineHeight = max(lineHeight, size.height)
-        }
-    }
-}
-
 // MARK: - AppKit Key Event Handler for Global Shortcuts
 
 struct KeyboardNavigationHelper: NSViewRepresentable {
@@ -529,6 +671,7 @@ struct KeyboardNavigationHelper: NSViewRepresentable {
     var onSpeedDown: (() -> Void)? = nil
     var onFontGrow: (() -> Void)? = nil
     var onFontShrink: (() -> Void)? = nil
+    var onToggleDebug: (() -> Void)? = nil
     
     func makeNSView(context: Context) -> KeyView {
         let view = KeyView()
@@ -552,6 +695,7 @@ struct KeyboardNavigationHelper: NSViewRepresentable {
         view.onSpeedDown = onSpeedDown
         view.onFontGrow = onFontGrow
         view.onFontShrink = onFontShrink
+        view.onToggleDebug = onToggleDebug
     }
     
     final class KeyView: NSView {
@@ -566,6 +710,7 @@ struct KeyboardNavigationHelper: NSViewRepresentable {
         var onSpeedDown: (() -> Void)?
         var onFontGrow: (() -> Void)?
         var onFontShrink: (() -> Void)?
+        var onToggleDebug: (() -> Void)?
         
         override var acceptsFirstResponder: Bool { true }
         
@@ -590,6 +735,8 @@ struct KeyboardNavigationHelper: NSViewRepresentable {
                 onEscape?()
             case 15: // 'R' or 'r'
                 onReset?()
+            case 2: // 'D' or 'd' (Toggle Debug HUD)
+                onToggleDebug?()
             case 24: // '+' or '='
                 onSpeedUp?()
             case 27: // '-' or '_'

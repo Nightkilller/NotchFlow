@@ -42,6 +42,17 @@ if [ -f "Packaging/AppIcon.icns" ]; then
     cp "Packaging/AppIcon.icns" "$RESOURCES_DIR/AppIcon.icns"
 fi
 
+# Copy Whisper model into bundle Resources
+if [ ! -f "Models/ggml-base.en.bin" ]; then
+    bash ./scripts/download_model.sh
+fi
+if [ -f "Models/ggml-base.en.bin" ]; then
+    echo "==> Installing Whisper model into Resources..."
+    cp "Models/ggml-base.en.bin" "$RESOURCES_DIR/ggml-base.en.bin"
+    mkdir -p "$HOME/Library/Application Support/NotchFlow/Models"
+    cp "Models/ggml-base.en.bin" "$HOME/Library/Application Support/NotchFlow/Models/ggml-base.en.bin"
+fi
+
 # Ad-hoc codesign the bundle
 echo "==> Applying ad-hoc codesignature..."
 codesign --force --deep --sign - "$APP_DIR"

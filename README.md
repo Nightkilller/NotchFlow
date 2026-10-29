@@ -1,4 +1,4 @@
-# NotchFlow
+# Notchyy-Teleprompter
 
 A native macOS speech-synchronized teleprompter anchored directly to your MacBook display notch.
 
