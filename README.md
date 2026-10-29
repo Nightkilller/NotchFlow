@@ -1,89 +1,105 @@
 # NotchFlow
 
-A native macOS teleprompter that anchors to the MacBook notch and follows your voice.
+A native macOS speech-synchronized teleprompter anchored directly to your MacBook display notch.
+
+![NotchFlow Banner](NotchFlow/Resources/AppInfo.json)
 
 ## What is NotchFlow?
 
-NotchFlow is a speech-synchronized teleprompter designed for MacBook users. It displays your script in a compact, notch-anchored overlay so you can read prepared material while looking toward your camera.
+NotchFlow is a native macOS teleprompter designed specifically for Apple Silicon MacBooks. It positions an ultra-smooth, floating teleprompter window right below your display notch and camera so you can deliver natural, confident presentations while keeping direct eye contact with your audience.
 
-As you speak, NotchFlow highlights the current word, dims previously spoken text, and keeps upcoming lines visible — inspired by synchronized lyrics interfaces.
+As you speak, NotchFlow follows your voice in real time using Apple's on-device speech framework. Each word illuminates in Spotify-style high-contrast orange, while past text softens and upcoming sentences remain crystal-clear.
+
+---
 
 ## Key Features
 
-- **Notch-anchored teleprompter** — positions the reading surface around the MacBook display notch
-- **Voice-paced reading** — follows your speech using on-device speech recognition
-- **Word-level highlighting** — current word accented, completed words dimmed, upcoming words bright
-- **Manual controls** — keyboard navigation when voice tracking isn't available
-- **Document import** — paste text or import TXT, PDF, and Markdown files
-- **Local-only storage** — scripts stay on your Mac, no account required
+- **🎯 Display Notch Integration:** Accurately measures physical display geometry (`auxiliaryTopLeftArea` / `auxiliaryTopRightArea`) to position the teleprompter directly beneath the camera. Smoothly transitions between a minimal collapsed status pill and an expanded HUD.
+- **🎙️ Speech-Synchronized Tracking:** Leverages `SFSpeechRecognizer` and `AVAudioEngine` for low-latency word tracking. Uses Levenshtein distance matching and forward confirmation windows to prevent jitter.
+- **✨ Spotify-Style Word Highlighting:** Real-time visual feedback:
+  - **Completed Words:** Softened to 38% opacity.
+  - **Active Word:** Radiant accent orange with ambient glow and subtle scale.
+  - **Active Sentence:** Soft ambient container highlight.
+  - **Upcoming Words:** Crisp readable white.
+- **⚡ Pre-Start Countdown:** Configurable 3-second or 5-second countdown ("3... 2... 1... Speak!") to prepare you before voice tracking begins.
+- **👀 Eye-Level Reading Guide Line:** Subtle horizontal eye-level indicator with arrow guides placed right at the camera focal plane.
+- **🪞 Beam-Splitter Mirror Mode:** One-click horizontal text flipping for physical teleprompter glass rigs.
+- **📄 Universal Document Import:** Paste directly or import `.txt`, `.md`, and `.pdf` documents with automated cleanup of markdown syntax, page numbers, and soft hyphenated line wraps.
+- **💾 Local-First Persistence:** Debounced autosave with JSON library persistence in `~/Library/Application Support/NotchFlow/`. Zero cloud, zero telemetry.
+- **⌨️ Pro Keyboard Shortcuts:**
+  - `Space` — Play / Pause
+  - `←` / `→` — Step backward / forward one word
+  - `↑` / `↓` — Jump backward / forward one sentence
+  - `R` — Reset to beginning
+  - `+` / `-` — Increase / decrease reading speed
+  - `[` / `]` — Increase / decrease teleprompter font size
+  - `Esc` — Collapse to notch pill or dismiss
+- **📦 Packaged `.app` Bundle:** Fully packaged with `Info.plist` declaring camera-safe non-activating window HUD behavior and TCC permissions for Microphone and Speech Recognition.
 
-## Requirements
+---
 
-- macOS 15.0 (Sequoia) or later
-- MacBook with Apple Silicon (M-series)
-- MacBook with display notch (for notch-anchored positioning)
-- Microphone access (for voice-paced reading)
+## System Requirements
 
-The application can be used without a notch display (centered fallback) and without a microphone (manual or auto-scroll modes).
+- **Operating System:** macOS 14.0 (Sonoma), macOS 15.0 (Sequoia), or later.
+- **Hardware:** Apple Silicon Mac (M1/M2/M3/M4) recommended. Works on MacBook displays with notch as well as external monitors (centered fallback).
+- **Permissions:** Microphone access and Speech Recognition (prompted upon first voice session).
 
-## Development Setup
+---
 
-### Prerequisites
+## Quick Start & Build Instructions
 
-- Swift 6.0+ (included with Xcode 16+ or Command Line Tools)
-- macOS 15.0 SDK or later
-
-### Build
-
+### 1. Run Unit Tests (58 passing tests)
 ```bash
-swift build
+./build.sh test
 ```
 
-### Run
-
+### 2. Build Release Binary
 ```bash
-swift run NotchFlow
+./build.sh release
 ```
 
-### Test
-
+### 3. Package Native macOS Application Bundle (`NotchFlow.app`)
 ```bash
-swift test
+./build.sh package
+```
+This produces `dist/NotchFlow.app` ready to launch:
+```bash
+open dist/NotchFlow.app
 ```
 
-## Current Status
+### 4. Run Directly from Source
+```bash
+./build.sh run
+```
 
-**Phase 0 — Environment and Project Discovery** ✅
+---
 
-- Project structure established
-- Design system created
-- Core data models implemented
-- Initial editor view created
-- Unit tests for models written
-- Documentation initialized
+## Architecture Overview
 
-See [Documentation/DEVELOPMENT_PLAN.md](Documentation/DEVELOPMENT_PLAN.md) for the full roadmap.
+NotchFlow is built with Swift 6 and strict concurrency safety without external dependencies:
 
-## Architecture
+```
+NotchFlow/
+├── App/                  # App entry point, AppDelegate lifecycle hooks
+├── Models/               # Script, ScriptSection, ScriptSentence, ScriptWord, ReadingSettings
+├── ViewModels/           # EditorViewModel, TeleprompterViewModel
+├── Views/
+│   ├── Editor/           # MainEditorView (Sidebar library, editor surface, live metrics)
+│   ├── Notch/            # NotchContainerView, CollapsedNotchView, TeleprompterView, WordHighlightView
+│   └── Settings/         # SettingsView (Typography, Notch dimensions, Playback defaults)
+├── Services/
+│   ├── Import/           # ScriptImportService, PDFImportService, MarkdownImportService, PlainTextImportService
+│   ├── Speech/           # SpeechRecognitionService, SpeechPermissionService
+│   ├── Synchronization/  # ReadingPositionService, ScriptMatchingService, TextNormalizationService, ScriptStructuringService
+│   └── Storage/          # ScriptStorageService, SettingsStorageService
+├── WindowManagement/     # NotchWindowController (NSPanel HUD), DisplayGeometryService
+└── DesignSystem/         # AppColors, AppTypography, AppSpacing, AnimationConfiguration
+```
 
-The application follows MVVM with clear service-layer separation:
+---
 
-- **Models** — Script, Section, Sentence, Word with stable identities
-- **Views** — SwiftUI views for editor and teleprompter
-- **ViewModels** — Bridge between views and services
-- **Services** — Import, Speech, Synchronization, Storage, Timing
-- **WindowManagement** — AppKit-based notch positioning
-- **DesignSystem** — Centralized colors, typography, spacing, animations
+## Privacy & Security
 
-See [Documentation/ARCHITECTURE.md](Documentation/ARCHITECTURE.md) for details.
-
-## Privacy
-
-- All scripts are stored locally in Application Support
-- Speech recognition uses Apple's framework (on-device when available)
-- No accounts, cloud storage, or analytics
-- Microphone is only active during teleprompter sessions
-
-## License
-
-Private project — not licensed for redistribution.
+- **Strictly Local:** Scripts, preferences, and speech recognition occur on-device. No telemetry, third-party trackers, or servers.
+- **Capture Safe:** Teleprompter window uses `NSWindow.sharingType = .readOnly`, making it clean and standard for presentation workflows.
+- **Sandboxed TCC:** Requires explicit user authorization for microphone input and speech recognition via macOS System Settings.

@@ -211,7 +211,8 @@ final class EditorViewModel: ObservableObject {
         saveCurrentScript()
         rebuildStructuredScript()
         isTeleprompterPresented = true
-        NotchWindowController.shared.present(with: structuredScript, initialMode: mode)
+        let settings = SettingsStorageService.load()
+        NotchWindowController.shared.present(with: structuredScript, settings: settings, initialMode: mode)
     }
     
     func dismissTeleprompter() {

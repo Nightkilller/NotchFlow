@@ -91,8 +91,12 @@ final class NotchWindowController: NSWindowController {
     // MARK: - Public Lifecycle
     
     /// Presents the teleprompter window anchored to the MacBook notch.
-    func present(with script: Script, initialMode: NotchWindowState = .expanded) {
-        let vm = TeleprompterViewModel(script: script)
+    func present(
+        with script: Script,
+        settings: ReadingSettings = SettingsStorageService.load(),
+        initialMode: NotchWindowState = .expanded
+    ) {
+        let vm = TeleprompterViewModel(script: script, settings: settings)
         self.teleprompterViewModel = vm
         
         let containerView = NotchContainerView(

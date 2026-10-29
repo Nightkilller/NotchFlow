@@ -3,10 +3,12 @@ import SwiftUI
 // MARK: - Teleprompter Reading View
 
 /// The primary teleprompter display window featuring word-level visual synchronization,
-/// auto-scrolling viewport, playback controls, and keyboard navigation.
+/// auto-scrolling viewport, playback controls, reading guide line, mirror mode,
+/// pre-start countdown, and keyboard navigation.
 struct TeleprompterView: View {
     @ObservedObject var viewModel: TeleprompterViewModel
     let onDismiss: () -> Void
+    var onCollapse: (() -> Void)? = nil
     
     @SwiftUI.State private var showControlsHUD: Bool = true
     
@@ -24,7 +26,19 @@ struct TeleprompterView: View {
                     .background(AppColors.divider)
                 
                 // MARK: Reading Surface
-                readingSurface
+                ZStack {
+                    readingSurface
+                    
+                    // Reading Guide Line Overlay (Eye-level anchor)
+                    if viewModel.settings.showReadingGuide {
+                        readingGuideLine
+                    }
+                    
+                    // Countdown Overlay (3... 2... 1... Speak!)
+                    if let remaining = viewModel.countdownRemaining {
+                        countdownOverlay(seconds: remaining)
+                    }
+                }
                 
                 Divider()
                     .background(AppColors.divider)
@@ -42,7 +56,12 @@ struct TeleprompterView: View {
                 onRight: { viewModel.stepForward() },
                 onUp: { viewModel.stepSentenceBackward() },
                 onDown: { viewModel.stepSentenceForward() },
-                onEscape: { onDismiss() }
+                onEscape: { onDismiss() },
+                onReset: { viewModel.reset() },
+                onSpeedUp: { viewModel.updateSpeed(delta: 10) },
+                onSpeedDown: { viewModel.updateSpeed(delta: -10) },
+                onFontGrow: { viewModel.updateFontSize(delta: 2) },
+                onFontShrink: { viewModel.updateFontSize(delta: -2) }
             )
         )
     }
@@ -120,6 +139,20 @@ struct TeleprompterView: View {
             .background(AppColors.surfaceBackground)
             .clipShape(RoundedRectangle(cornerRadius: AppSpacing.cornerRadiusSm))
             
+            // Collapse Button (if hosted inside notch container)
+            if let onCollapse = onCollapse {
+                Button {
+                    onCollapse()
+                } label: {
+                    Image(systemName: "arrow.up.backward.and.arrow.down.forward")
+                        .font(.system(size: 12, weight: .semibold))
+                        .foregroundStyle(AppColors.secondaryText)
+                        .frame(width: 24, height: 24)
+                }
+                .buttonStyle(.plain)
+                .help("Collapse to Notch Pill")
+            }
+            
             // Close / Exit Button
             Button {
                 viewModel.pause()
@@ -157,7 +190,22 @@ struct TeleprompterView: View {
                 }
                 .padding(.horizontal, AppSpacing.xxl)
                 .frame(maxWidth: .infinity, alignment: .leading)
+                // Mirror / Flip text horizontally if enabled
+                .scaleEffect(x: viewModel.settings.mirrorText ? -1 : 1, y: 1)
             }
+            // Soft cinematic fade at top and bottom edges
+            .mask(
+                LinearGradient(
+                    stops: [
+                        .init(color: .clear, location: 0),
+                        .init(color: .black, location: 0.10),
+                        .init(color: .black, location: 0.90),
+                        .init(color: .clear, location: 1.0)
+                    ],
+                    startPoint: .top,
+                    endPoint: .bottom
+                )
+            )
             // Automatically keep current word visible and centered
             .onChange(of: viewModel.currentWordId) { _, targetWordId in
                 if let targetId = targetWordId {
@@ -202,6 +250,72 @@ struct TeleprompterView: View {
         .animation(AnimationConfig.standard, value: isCurrent)
     }
     
+    // MARK: - Reading Guide Line (Eye-Level)
+    
+    private var readingGuideLine: some View {
+        GeometryReader { geo in
+            let guideY = geo.size.height * 0.38
+            HStack(spacing: AppSpacing.xs) {
+                Image(systemName: "chevron.right")
+                    .font(.system(size: 9, weight: .bold))
+                    .foregroundStyle(AppColors.accent.opacity(0.8))
+                
+                Rectangle()
+                    .fill(
+                        LinearGradient(
+                            colors: [
+                                AppColors.accent.opacity(0.4),
+                                AppColors.accent.opacity(0.1),
+                                AppColors.accent.opacity(0.4)
+                            ],
+                            startPoint: .leading,
+                            endPoint: .trailing
+                        )
+                    )
+                    .frame(height: 1)
+                
+                Image(systemName: "chevron.left")
+                    .font(.system(size: 9, weight: .bold))
+                    .foregroundStyle(AppColors.accent.opacity(0.8))
+            }
+            .padding(.horizontal, AppSpacing.lg)
+            .position(x: geo.size.width / 2, y: guideY)
+            .allowsHitTesting(false)
+        }
+    }
+    
+    // MARK: - Countdown Overlay
+    
+    private func countdownOverlay(seconds: Int) -> some View {
+        ZStack {
+            Color.black.opacity(0.72)
+                .ignoresSafeArea()
+            
+            VStack(spacing: AppSpacing.sm) {
+                Text("\(seconds)")
+                    .font(.system(size: 72, weight: .heavy, design: .rounded))
+                    .foregroundStyle(AppColors.accent)
+                    .shadow(color: AppColors.accent.opacity(0.6), radius: 18)
+                    .transition(.scale.combined(with: .opacity))
+                    .id("countdown-\(seconds)")
+                
+                Text("Get Ready to Speak")
+                    .font(AppTypography.settingsHeading)
+                    .foregroundStyle(AppColors.primaryText)
+                
+                Button("Skip Countdown") {
+                    viewModel.play()
+                }
+                .buttonStyle(.plain)
+                .font(AppTypography.smallLabel)
+                .foregroundStyle(AppColors.secondaryText)
+                .padding(.top, AppSpacing.xs)
+            }
+        }
+        .transition(.opacity)
+        .animation(AnimationConfig.standard, value: seconds)
+    }
+    
     // MARK: - Controls HUD
     
     private var controlsHUD: some View {
@@ -244,7 +358,7 @@ struct TeleprompterView: View {
                             .foregroundStyle(AppColors.secondaryText)
                     }
                     .buttonStyle(.plain)
-                    .help("Reset to Beginning")
+                    .help("Reset to Beginning (R)")
                     
                     // Step Backward
                     Button {
@@ -261,7 +375,7 @@ struct TeleprompterView: View {
                     Button {
                         viewModel.togglePlayPause()
                     } label: {
-                        Image(systemName: viewModel.isPlaying ? "pause.circle.fill" : "play.circle.fill")
+                        Image(systemName: (viewModel.isPlaying || viewModel.countdownRemaining != nil) ? "pause.circle.fill" : "play.circle.fill")
                             .font(.system(size: 36))
                             .foregroundStyle(AppColors.accent)
                     }
@@ -294,6 +408,7 @@ struct TeleprompterView: View {
                             .clipShape(Circle())
                     }
                     .buttonStyle(.plain)
+                    .help("Decrease Speed (-)")
                     
                     Text("\(Int(viewModel.settings.autoScrollSpeed)) WPM")
                         .font(AppTypography.timerDisplay)
@@ -310,6 +425,7 @@ struct TeleprompterView: View {
                             .clipShape(Circle())
                     }
                     .buttonStyle(.plain)
+                    .help("Increase Speed (+)")
                 }
                 .foregroundStyle(AppColors.secondaryText)
             }
@@ -376,25 +492,34 @@ struct KeyboardNavigationHelper: NSViewRepresentable {
     var onUp: () -> Void
     var onDown: () -> Void
     var onEscape: () -> Void
+    var onReset: (() -> Void)? = nil
+    var onSpeedUp: (() -> Void)? = nil
+    var onSpeedDown: (() -> Void)? = nil
+    var onFontGrow: (() -> Void)? = nil
+    var onFontShrink: (() -> Void)? = nil
     
     func makeNSView(context: Context) -> KeyView {
         let view = KeyView()
+        updateKeyView(view)
+        return view
+    }
+    
+    func updateNSView(_ nsView: KeyView, context: Context) {
+        updateKeyView(nsView)
+    }
+    
+    private func updateKeyView(_ view: KeyView) {
         view.onSpace = onSpace
         view.onLeft = onLeft
         view.onRight = onRight
         view.onUp = onUp
         view.onDown = onDown
         view.onEscape = onEscape
-        return view
-    }
-    
-    func updateNSView(_ nsView: KeyView, context: Context) {
-        nsView.onSpace = onSpace
-        nsView.onLeft = onLeft
-        nsView.onRight = onRight
-        nsView.onUp = onUp
-        nsView.onDown = onDown
-        nsView.onEscape = onEscape
+        view.onReset = onReset
+        view.onSpeedUp = onSpeedUp
+        view.onSpeedDown = onSpeedDown
+        view.onFontGrow = onFontGrow
+        view.onFontShrink = onFontShrink
     }
     
     final class KeyView: NSView {
@@ -404,6 +529,11 @@ struct KeyboardNavigationHelper: NSViewRepresentable {
         var onUp: (() -> Void)?
         var onDown: (() -> Void)?
         var onEscape: (() -> Void)?
+        var onReset: (() -> Void)?
+        var onSpeedUp: (() -> Void)?
+        var onSpeedDown: (() -> Void)?
+        var onFontGrow: (() -> Void)?
+        var onFontShrink: (() -> Void)?
         
         override var acceptsFirstResponder: Bool { true }
         
@@ -426,6 +556,16 @@ struct KeyboardNavigationHelper: NSViewRepresentable {
                 onDown?()
             case 53: // Escape
                 onEscape?()
+            case 15: // 'R' or 'r'
+                onReset?()
+            case 24: // '+' or '='
+                onSpeedUp?()
+            case 27: // '-' or '_'
+                onSpeedDown?()
+            case 30: // ']'
+                onFontGrow?()
+            case 33: // '['
+                onFontShrink?()
             default:
                 super.keyDown(with: event)
             }

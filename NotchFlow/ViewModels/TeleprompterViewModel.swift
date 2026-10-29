@@ -23,9 +23,11 @@ final class TeleprompterViewModel: ObservableObject {
     @Published var isSimulating: Bool = false
     @Published var isListening: Bool = false
     @Published var statusMessage: String?
+    @Published var countdownRemaining: Int? = nil
     
-    // Auto-scroll and session timers
+    // Auto-scroll, countdown, and session timers
     private var playbackTimer: AnyCancellable?
+    private var countdownTimer: AnyCancellable?
     private var sessionTimer: AnyCancellable?
     private var positionCancellable: AnyCancellable?
     private var simulationCancellable: AnyCancellable?
@@ -100,7 +102,7 @@ final class TeleprompterViewModel: ObservableObject {
     // MARK: - Playback Controls
     
     func togglePlayPause() {
-        if isPlaying {
+        if isPlaying || countdownRemaining != nil {
             pause()
         } else {
             play()
@@ -109,6 +111,41 @@ final class TeleprompterViewModel: ObservableObject {
     
     func play() {
         guard !position.isAtEnd else { return }
+        
+        // Pre-start countdown if starting from beginning and configured
+        if settings.countdownSeconds > 0 && position.currentWordIndex <= 0 {
+            startCountdown()
+        } else {
+            beginPlayback()
+        }
+    }
+    
+    private func startCountdown() {
+        stopCountdown()
+        countdownRemaining = settings.countdownSeconds
+        
+        countdownTimer = Timer.publish(every: 1.0, on: .main, in: .common)
+            .autoconnect()
+            .sink { [weak self] _ in
+                guard let self = self else { return }
+                if let current = self.countdownRemaining {
+                    if current > 1 {
+                        self.countdownRemaining = current - 1
+                    } else {
+                        self.stopCountdown()
+                        self.beginPlayback()
+                    }
+                }
+            }
+    }
+    
+    private func stopCountdown() {
+        countdownTimer?.cancel()
+        countdownTimer = nil
+        countdownRemaining = nil
+    }
+    
+    private func beginPlayback() {
         isPlaying = true
         startSessionTimer()
         
@@ -123,6 +160,7 @@ final class TeleprompterViewModel: ObservableObject {
     }
     
     func pause() {
+        stopCountdown()
         isPlaying = false
         positionService.stopSimulation()
         speechService.stopListening()
@@ -231,7 +269,7 @@ final class TeleprompterViewModel: ObservableObject {
         }
     }
     
-    // MARK: - Speed Tuning
+    // MARK: - Speed & Font Tuning
     
     func updateSpeed(delta: Double) {
         let newSpeed = max(60, min(350, settings.autoScrollSpeed + delta))
@@ -242,6 +280,11 @@ final class TeleprompterViewModel: ObservableObject {
         if isSimulating {
             positionService.startSimulation(wordsPerMinute: newSpeed)
         }
+    }
+    
+    func updateFontSize(delta: CGFloat) {
+        let newSize = max(AppTypography.teleprompterMinSize, min(AppTypography.teleprompterMaxSize, settings.fontSize + delta))
+        settings.fontSize = newSize
     }
     
     // MARK: - Timers

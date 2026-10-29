@@ -2,6 +2,8 @@
 
 # Build artifacts
 .build/
+dist/
+*.app/
 DerivedData/
 *.xcodeproj/project.xcworkspace/xcuserdata/
 *.xcodeproj/xcuserdata/

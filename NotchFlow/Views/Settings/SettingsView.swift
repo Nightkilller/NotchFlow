@@ -126,6 +126,43 @@ struct SettingsView: View {
                             
                             Slider(value: $settings.autoScrollSpeed, in: 80...300, step: 10)
                                 .tint(AppColors.accent)
+                            
+                            Divider()
+                                .background(AppColors.divider)
+                            
+                            // Pre-start Countdown
+                            HStack {
+                                Text("Pre-Start Countdown")
+                                    .font(AppTypography.settingsLabel)
+                                    .foregroundStyle(AppColors.primaryText)
+                                Spacer()
+                                
+                                Picker("", selection: $settings.countdownSeconds) {
+                                    Text("Off").tag(0)
+                                    Text("3s").tag(3)
+                                    Text("5s").tag(5)
+                                }
+                                .pickerStyle(.segmented)
+                                .frame(width: 150)
+                            }
+                            
+                            // Reading Guide Line Toggle
+                            Toggle(isOn: $settings.showReadingGuide) {
+                                Text("Show Eye-Level Reading Guide")
+                                    .font(AppTypography.settingsLabel)
+                                    .foregroundStyle(AppColors.primaryText)
+                            }
+                            .toggleStyle(.switch)
+                            .tint(AppColors.accent)
+                            
+                            // Mirror Text Toggle
+                            Toggle(isOn: $settings.mirrorText) {
+                                Text("Mirror Text (Beam-Splitter Glass)")
+                                    .font(AppTypography.settingsLabel)
+                                    .foregroundStyle(AppColors.primaryText)
+                            }
+                            .toggleStyle(.switch)
+                            .tint(AppColors.accent)
                         }
                     }
                     

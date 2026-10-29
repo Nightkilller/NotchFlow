@@ -176,4 +176,40 @@ struct TeleprompterViewModelTests {
         #expect(vm.position.currentWordIndex == 0)
         #expect(vm.elapsedTime == 0)
     }
+    
+    @Test("Countdown initiates on play from beginning when configured")
+    func countdownInitiation() {
+        let script = createTestScript()
+        var settings = ReadingSettings()
+        settings.countdownSeconds = 3
+        let vm = TeleprompterViewModel(script: script, settings: settings)
+        
+        #expect(vm.countdownRemaining == nil)
+        vm.play()
+        #expect(vm.countdownRemaining == 3)
+        
+        // Pausing during countdown clears countdown
+        vm.pause()
+        #expect(vm.countdownRemaining == nil)
+        #expect(!vm.isPlaying)
+    }
+    
+    @Test("Speed and font adjustments clamp within valid boundaries")
+    func tuningClamping() {
+        let script = createTestScript()
+        let vm = TeleprompterViewModel(script: script)
+        
+        // Font size bounds
+        vm.updateFontSize(delta: 100)
+        #expect(vm.settings.fontSize <= AppTypography.teleprompterMaxSize)
+        vm.updateFontSize(delta: -200)
+        #expect(vm.settings.fontSize >= AppTypography.teleprompterMinSize)
+        
+        // Speed bounds
+        vm.updateSpeed(delta: 500)
+        #expect(vm.settings.autoScrollSpeed <= 350)
+        vm.updateSpeed(delta: -500)
+        #expect(vm.settings.autoScrollSpeed >= 60)
+    }
 }
+

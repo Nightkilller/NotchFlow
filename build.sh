@@ -22,12 +22,16 @@ case "${1:-build}" in
         echo "Building release..."
         swift build -c release $PLUGIN_FLAGS
         ;;
+    package)
+        echo "Packaging NotchFlow.app bundle..."
+        bash ./scripts/package_app.sh
+        ;;
     clean)
         echo "Cleaning..."
         swift package clean
         ;;
     *)
-        echo "Usage: ./build.sh [build|run|test|release|clean]"
+        echo "Usage: ./build.sh [build|run|test|release|package|clean]"
         exit 1
         ;;
 esac
