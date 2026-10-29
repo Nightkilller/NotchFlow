@@ -36,6 +36,12 @@ cp "Packaging/Info.plist" "$CONTENTS_DIR/Info.plist"
 # Create PkgInfo
 echo "APPL????" > "$CONTENTS_DIR/PkgInfo"
 
+# Copy App Icon if present
+if [ -f "Packaging/AppIcon.icns" ]; then
+    echo "==> Installing AppIcon.icns..."
+    cp "Packaging/AppIcon.icns" "$RESOURCES_DIR/AppIcon.icns"
+fi
+
 # Ad-hoc codesign the bundle
 echo "==> Applying ad-hoc codesignature..."
 codesign --force --deep --sign - "$APP_DIR"
