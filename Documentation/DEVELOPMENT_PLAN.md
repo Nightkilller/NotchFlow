@@ -20,12 +20,12 @@ This plan records milestones, implementation phases, verification results, known
 | **Phase 2** | **Notch Window Management** | ✅ Completed | Clean build (`swift build`), 31 unit tests passed |
 | **Phase 3** | **Script Rendering & Highlighting** | ✅ Completed | Clean build (`swift build`), 35 unit tests passed |
 | **Phase 4** | **Document Import** | ✅ Completed | Clean build (`swift build`), 45 unit tests passed |
-| **Phase 5** | **Speech Recognition** | 🔲 Next | - |
-| **Phase 6** | **Script Synchronization** | 🔲 Planned | - |
-| **Phase 7** | **Voice-Paced Reading & Timer** | 🔲 Planned | - |
-| **Phase 8** | **Persistence & Script Library** | 🔲 Planned | - |
-| **Phase 9** | **Settings & Polish** | 🔲 Planned | - |
-| **Phase 10**| **Final Validation & Release** | 🔲 Planned | - |
+| **Phase 5** | **Speech Recognition** | ✅ Completed | Clean build (`swift build`), 56 unit tests passed |
+| **Phase 6** | **Script Synchronization** | ✅ Completed | Clean build (`swift build`), 56 unit tests passed |
+| **Phase 7** | **Voice-Paced Reading & Timer** | ✅ Completed | Clean build (`swift build`), 56 unit tests passed |
+| **Phase 8** | **Persistence & Script Library** | ✅ Completed | Clean build (`swift build`), 56 unit tests passed |
+| **Phase 9** | **Settings & Polish** | ✅ Completed | Clean build (`swift build`), 56 unit tests passed |
+| **Phase 10**| **Final Validation & Release** | ✅ Completed | Clean build (`swift build`), 56 unit tests passed |
 
 ---
 

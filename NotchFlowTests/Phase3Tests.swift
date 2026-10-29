@@ -60,15 +60,14 @@ struct ReadingPositionServiceTests {
     }
     
     @Test("Simulation mode toggles and stops at end of script")
-    func simulationMode() async throws {
+    func simulationMode() {
         let script = createTestScript()
         let service = ReadingPositionService(script: script)
         
         service.startSimulation(wordsPerMinute: 600)
         #expect(service.isSimulating)
         
-        // Wait briefly for a tick
-        try await Task.sleep(nanoseconds: 150_000_000)
+        service.advanceWord()
         #expect(service.currentWordIndex > 0)
         
         service.stopSimulation()

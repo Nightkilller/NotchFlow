@@ -7,6 +7,8 @@ import SwiftUI
 /// and launches the teleprompter reading view.
 struct MainEditorView: View {
     @StateObject private var viewModel = EditorViewModel()
+    @SwiftUI.State private var showSettingsSheet: Bool = false
+    @SwiftUI.State private var readingSettings: ReadingSettings = SettingsStorageService.load()
 
     var body: some View {
         ZStack {
@@ -76,6 +78,11 @@ struct MainEditorView: View {
         } message: {
             Text(viewModel.errorMessage ?? "An error occurred while importing the document.")
         }
+        .sheet(isPresented: $showSettingsSheet) {
+            SettingsView(settings: $readingSettings) {
+                showSettingsSheet = false
+            }
+        }
     }
 
     // MARK: - Title Bar
@@ -104,6 +111,17 @@ struct MainEditorView: View {
                     .font(AppTypography.editorCaption)
                     .foregroundStyle(AppColors.secondaryText)
             }
+            
+            // Settings Button
+            Button {
+                showSettingsSheet = true
+            } label: {
+                Image(systemName: "gearshape")
+                    .font(.system(size: 13))
+                    .foregroundStyle(AppColors.secondaryText)
+            }
+            .buttonStyle(.plain)
+            .help("Preferences & Settings")
         }
         .padding(.horizontal, AppSpacing.lg)
         .padding(.vertical, AppSpacing.md)
@@ -119,10 +137,25 @@ struct MainEditorView: View {
                 .foregroundStyle(AppColors.primaryText)
                 .padding(.top, AppSpacing.lg)
 
-            // Current Active Script
-            VStack(alignment: .leading, spacing: AppSpacing.xs) {
-                sidebarItem(title: viewModel.scriptTitle, isSelected: true)
+            // Saved Scripts List
+            ScrollView(.vertical, showsIndicators: false) {
+                VStack(alignment: .leading, spacing: AppSpacing.xs) {
+                    if viewModel.savedScripts.isEmpty {
+                        sidebarItem(
+                            script: viewModel.structuredScript,
+                            isSelected: true
+                        )
+                    } else {
+                        ForEach(viewModel.savedScripts) { script in
+                            sidebarItem(
+                                script: script,
+                                isSelected: script.id == viewModel.structuredScript.id
+                            )
+                        }
+                    }
+                }
             }
+            .frame(maxHeight: .infinity)
 
             // Quick Actions
             VStack(alignment: .leading, spacing: AppSpacing.sm) {
@@ -151,9 +184,7 @@ struct MainEditorView: View {
                 }
                 .buttonStyle(.plain)
             }
-            .padding(.top, AppSpacing.sm)
-
-            Spacer()
+            .padding(.vertical, AppSpacing.sm)
 
             // New script button
             Button {
@@ -174,24 +205,41 @@ struct MainEditorView: View {
         .background(AppColors.secondaryBackground)
     }
 
-    private func sidebarItem(title: String, isSelected: Bool) -> some View {
-        HStack(spacing: AppSpacing.sm) {
-            Image(systemName: "doc.text")
-                .font(.system(size: 12))
-            Text(title.isEmpty ? "Untitled Script" : title)
-                .font(AppTypography.editorBody)
-                .lineLimit(1)
-            Spacer()
+    private func sidebarItem(script: Script, isSelected: Bool) -> some View {
+        Button {
+            viewModel.selectScript(script)
+        } label: {
+            HStack(spacing: AppSpacing.sm) {
+                Image(systemName: "doc.text")
+                    .font(.system(size: 12))
+                Text(script.title.isEmpty ? "Untitled Script" : script.title)
+                    .font(AppTypography.editorBody)
+                    .lineLimit(1)
+                Spacer()
+                
+                if viewModel.savedScripts.count > 1 {
+                    Button {
+                        viewModel.deleteScript(script)
+                    } label: {
+                        Image(systemName: "trash")
+                            .font(.system(size: 10))
+                            .foregroundStyle(AppColors.secondaryText.opacity(0.6))
+                    }
+                    .buttonStyle(.plain)
+                    .help("Delete script")
+                }
+            }
+            .foregroundStyle(isSelected ? AppColors.accent : AppColors.secondaryText)
+            .padding(.horizontal, AppSpacing.sm)
+            .padding(.vertical, AppSpacing.xs)
+            .background(
+                isSelected
+                    ? AppColors.accent.opacity(0.12)
+                    : Color.clear
+            )
+            .clipShape(RoundedRectangle(cornerRadius: AppSpacing.cornerRadiusSm))
         }
-        .foregroundStyle(isSelected ? AppColors.accent : AppColors.secondaryText)
-        .padding(.horizontal, AppSpacing.sm)
-        .padding(.vertical, AppSpacing.xs)
-        .background(
-            isSelected
-                ? AppColors.accent.opacity(0.1)
-                : Color.clear
-        )
-        .clipShape(RoundedRectangle(cornerRadius: AppSpacing.cornerRadiusSm))
+        .buttonStyle(.plain)
     }
 
     // MARK: - Editor Area

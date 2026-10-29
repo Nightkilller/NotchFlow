@@ -59,13 +59,30 @@ struct TeleprompterView: View {
             
             Spacer()
             
+            // Listening indicator if in voice-paced mode
+            if viewModel.isListening {
+                HStack(spacing: 4) {
+                    Image(systemName: "mic.fill")
+                        .font(.system(size: 11))
+                        .foregroundStyle(AppColors.accent)
+                    Text("Listening")
+                        .font(AppTypography.smallLabel)
+                        .foregroundStyle(AppColors.accent)
+                }
+                .padding(.horizontal, 6)
+                .padding(.vertical, 3)
+                .background(AppColors.accent.opacity(0.12))
+                .clipShape(Capsule())
+            }
+            
             // Reading Mode Picker
             Picker("", selection: $viewModel.settings.readingMode) {
-                Text("Auto-Scroll").tag(ReadingMode.autoScroll)
+                Text("Voice").tag(ReadingMode.voicePaced)
+                Text("Auto").tag(ReadingMode.autoScroll)
                 Text("Manual").tag(ReadingMode.manual)
             }
             .pickerStyle(.segmented)
-            .frame(width: 170)
+            .frame(width: 190)
             
             // Simulation / Debug Mode Button
             Button {

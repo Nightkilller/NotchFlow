@@ -58,7 +58,7 @@ struct EditorViewModelTests {
     
     @Test("Initial state has empty text and zero word count")
     func initialState() {
-        let vm = EditorViewModel()
+        let vm = EditorViewModel(autoLoadSaved: false)
         #expect(vm.wordCount == 0)
         #expect(!vm.canStartTeleprompter)
         #expect(!vm.isTeleprompterPresented)
