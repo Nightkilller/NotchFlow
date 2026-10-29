@@ -1,5 +1,14 @@
 import Foundation
 
+// MARK: - Word Visual State
+
+/// Visual state of a word in the teleprompter.
+enum WordVisualState: String, Sendable, Equatable, Codable {
+    case completed
+    case current
+    case upcoming
+}
+
 // MARK: - Reading Position
 
 /// Tracks the current reading position within a structured script.

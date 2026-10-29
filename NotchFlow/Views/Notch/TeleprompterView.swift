@@ -67,6 +67,29 @@ struct TeleprompterView: View {
             .pickerStyle(.segmented)
             .frame(width: 170)
             
+            // Simulation / Debug Mode Button
+            Button {
+                viewModel.toggleSimulation()
+            } label: {
+                HStack(spacing: 4) {
+                    Image(systemName: viewModel.isSimulating ? "sparkles" : "play.badge.sparkle")
+                        .font(.system(size: 11))
+                    Text(viewModel.isSimulating ? "Simulating" : "Simulate")
+                        .font(AppTypography.smallLabel)
+                }
+                .foregroundStyle(viewModel.isSimulating ? AppColors.accent : AppColors.secondaryText)
+                .padding(.horizontal, AppSpacing.sm)
+                .padding(.vertical, 4)
+                .background(
+                    viewModel.isSimulating
+                        ? AppColors.accent.opacity(0.15)
+                        : AppColors.surfaceBackground
+                )
+                .clipShape(RoundedRectangle(cornerRadius: AppSpacing.cornerRadiusSm))
+            }
+            .buttonStyle(.plain)
+            .help("Debug mode: Simulates speech-paced reading without a microphone")
+            
             // Elapsed Time Display
             HStack(spacing: AppSpacing.xs) {
                 Image(systemName: "timer")
@@ -138,47 +161,28 @@ struct TeleprompterView: View {
     }
     
     private func sentenceFlowView(_ sentence: ScriptSentence) -> some View {
-        // Render words wrapped in flow-style layout
-        FlowLayout(spacing: AppSpacing.sm) {
+        let isCurrent = viewModel.isCurrentSentence(sentence)
+        
+        return FlowLayout(spacing: AppSpacing.sm) {
             ForEach(sentence.words) { word in
-                wordView(word)
-                    .id(word.id)
+                WordHighlightView(
+                    word: word,
+                    state: viewModel.visualState(for: word),
+                    fontSize: viewModel.settings.fontSize,
+                    onTap: {
+                        viewModel.jumpToWord(at: word.globalIndex)
+                    }
+                )
+                .id(word.id)
             }
         }
-    }
-    
-    private func wordView(_ word: ScriptWord) -> some View {
-        let state = viewModel.visualState(for: word)
-        
-        return Button {
-            viewModel.jumpToWord(at: word.globalIndex)
-        } label: {
-            Text(word.text)
-                .font(AppTypography.teleprompterFont(size: viewModel.settings.fontSize))
-                .fontWeight(state == .current ? .bold : .medium)
-                .foregroundStyle(color(for: state))
-                .padding(.horizontal, 2)
-                .padding(.vertical, 1)
-                .background(
-                    state == .current
-                        ? AppColors.accent.opacity(0.18)
-                        : Color.clear
-                )
-                .clipShape(RoundedRectangle(cornerRadius: AppSpacing.cornerRadiusSm))
-        }
-        .buttonStyle(.plain)
-        .animation(AnimationConfig.wordHighlight, value: state)
-    }
-    
-    private func color(for state: WordVisualState) -> Color {
-        switch state {
-        case .completed:
-            AppColors.completedWord
-        case .current:
-            AppColors.currentWord
-        case .upcoming:
-            AppColors.upcomingWord
-        }
+        .padding(.horizontal, AppSpacing.sm)
+        .padding(.vertical, AppSpacing.xs)
+        .background(
+            RoundedRectangle(cornerRadius: AppSpacing.cornerRadiusMd)
+                .fill(isCurrent ? AppColors.surfaceBackground.opacity(0.65) : Color.clear)
+        )
+        .animation(AnimationConfig.standard, value: isCurrent)
     }
     
     // MARK: - Controls HUD

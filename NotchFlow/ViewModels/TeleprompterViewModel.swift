@@ -1,56 +1,59 @@
 import Foundation
 import Combine
 
-// MARK: - Word Visual State
-
-enum WordVisualState: Equatable, Sendable {
-    case completed
-    case current
-    case upcoming
-}
-
 // MARK: - Teleprompter View Model
 
 /// Orchestrates teleprompter playback, current word tracking, manual navigation,
-/// and auto-scroll timer progression.
+/// and auto-scroll / simulation timer progression.
 @MainActor
 final class TeleprompterViewModel: ObservableObject {
     
     // MARK: - Properties
     
     let script: Script
+    let positionService: ReadingPositionService
     
     @Published var position: ReadingPosition
     @Published var isPlaying: Bool = false
     @Published var settings: ReadingSettings
     @Published var elapsedTime: TimeInterval = 0
+    @Published var isSimulating: Bool = false
     
     // Auto-scroll and session timers
     private var playbackTimer: AnyCancellable?
     private var sessionTimer: AnyCancellable?
-    
-    // Flattened words lookup for rapid indexing
-    private let allWords: [ScriptWord]
+    private var positionCancellable: AnyCancellable?
+    private var simulationCancellable: AnyCancellable?
     
     // MARK: - Initialization
     
     init(script: Script, settings: ReadingSettings = ReadingSettings()) {
         self.script = script
         self.settings = settings
-        self.allWords = script.allWords
-        self.position = ReadingPosition(
-            currentWordIndex: allWords.isEmpty ? -1 : 0,
-            totalWords: allWords.count
-        )
+        let service = ReadingPositionService(script: script)
+        self.positionService = service
+        self.position = service.currentPosition
+        
+        // Listen to position updates from the service
+        self.positionCancellable = service.$currentPosition
+            .sink { [weak self] newPos in
+                self?.position = newPos
+            }
+            
+        self.simulationCancellable = service.$isSimulating
+            .sink { [weak self] simulating in
+                self?.isSimulating = simulating
+                if simulating {
+                    self?.isPlaying = true
+                    self?.startSessionTimer()
+                }
+            }
     }
     
     // MARK: - Computed Properties
     
     var currentWord: ScriptWord? {
-        guard position.currentWordIndex >= 0 && position.currentWordIndex < allWords.count else {
-            return nil
-        }
-        return allWords[position.currentWordIndex]
+        positionService.currentWord
     }
     
     var currentWordId: UUID? {
@@ -62,7 +65,7 @@ final class TeleprompterViewModel: ObservableObject {
     }
     
     var totalWordsCount: Int {
-        allWords.count
+        positionService.totalWords
     }
     
     var progressPercent: Int {
@@ -95,88 +98,65 @@ final class TeleprompterViewModel: ObservableObject {
     
     func pause() {
         isPlaying = false
+        positionService.stopSimulation()
         stopAutoScrollTimer()
         stopSessionTimer()
     }
     
     func reset() {
         pause()
-        position.moveTo(wordIndex: allWords.isEmpty ? -1 : 0)
+        positionService.resetToBeginning()
         elapsedTime = 0
     }
     
     // MARK: - Word & Sentence Navigation
     
     func stepForward() {
-        if position.moveToNextWord() {
-            if position.isAtEnd {
+        if positionService.advanceWord() {
+            if positionService.isAtEnd {
                 pause()
             }
         }
     }
     
     func stepBackward() {
-        position.moveToPreviousWord()
+        positionService.retreatWord()
     }
     
     func stepSentenceForward() {
-        guard let current = currentWord else {
-            stepForward()
-            return
+        positionService.advanceSentence()
+        if positionService.isAtEnd {
+            pause()
         }
-        
-        // Find next sentence whose first word index is greater than current word
-        for section in script.sections {
-            for sentence in section.sentences {
-                if let firstIdx = sentence.firstWordGlobalIndex, firstIdx > current.globalIndex {
-                    position.moveTo(wordIndex: firstIdx)
-                    return
-                }
-            }
-        }
-        // If no later sentence found, go to end
-        position.moveTo(wordIndex: max(0, totalWordsCount - 1))
-        pause()
     }
     
     func stepSentenceBackward() {
-        guard let current = currentWord else {
-            stepBackward()
-            return
-        }
-        
-        // Find the sentence containing current word or previous sentence
-        var targetIndex: Int = 0
-        for section in script.sections {
-            for sentence in section.sentences {
-                if let firstIdx = sentence.firstWordGlobalIndex,
-                   let lastIdx = sentence.lastWordGlobalIndex {
-                    if current.globalIndex > firstIdx && current.globalIndex <= lastIdx {
-                        // Current word is in middle of sentence -> jump to sentence start
-                        position.moveTo(wordIndex: firstIdx)
-                        return
-                    } else if firstIdx < current.globalIndex {
-                        targetIndex = firstIdx
-                    }
-                }
-            }
-        }
-        position.moveTo(wordIndex: targetIndex)
+        positionService.retreatSentence()
     }
     
     func jumpToWord(at globalIndex: Int) {
-        position.moveTo(wordIndex: globalIndex)
+        positionService.jumpToWord(at: globalIndex)
     }
     
     // MARK: - Visual State Query
     
     func visualState(for word: ScriptWord) -> WordVisualState {
-        if word.globalIndex < position.currentWordIndex {
-            return .completed
-        } else if word.globalIndex == position.currentWordIndex {
-            return .current
+        positionService.visualState(for: word)
+    }
+    
+    func isCurrentSentence(_ sentence: ScriptSentence) -> Bool {
+        positionService.isCurrentSentence(sentence)
+    }
+    
+    // MARK: - Simulation Mode (Debug reading without mic)
+    
+    func toggleSimulation() {
+        if isSimulating {
+            pause()
         } else {
-            return .upcoming
+            isPlaying = true
+            startSessionTimer()
+            positionService.startSimulation(wordsPerMinute: settings.autoScrollSpeed)
         }
     }
     
@@ -188,6 +168,9 @@ final class TeleprompterViewModel: ObservableObject {
         if isPlaying {
             configureAutoScrollTimer()
         }
+        if isSimulating {
+            positionService.startSimulation(wordsPerMinute: newSpeed)
+        }
     }
     
     // MARK: - Timers
@@ -196,7 +179,7 @@ final class TeleprompterViewModel: ObservableObject {
         stopAutoScrollTimer()
         
         // Only run automatic advancement timer when playing in autoScroll mode
-        guard settings.readingMode == .autoScroll else { return }
+        guard settings.readingMode == .autoScroll && !isSimulating else { return }
         
         let wordsPerSecond = max(1.0, settings.autoScrollSpeed / 60.0)
         let interval = 1.0 / wordsPerSecond
