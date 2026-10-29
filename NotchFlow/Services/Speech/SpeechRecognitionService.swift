@@ -55,19 +55,18 @@ final class SpeechRecognitionService: ObservableObject {
         request.shouldReportPartialResults = true
         request.addsPunctuation = true
         
-        // Prefer on-device recognition if supported
-        if recognizer.supportsOnDeviceRecognition {
-            request.requiresOnDeviceRecognition = true
-            AppLogger.speech.info("Using on-device speech recognition")
-        } else {
-            request.requiresOnDeviceRecognition = false
-            AppLogger.speech.info("On-device speech recognition not available for locale, using standard processing")
-        }
+        // Automatic on-device recognition when available; do not hard-require to prevent error 1700
+        request.requiresOnDeviceRecognition = false
         
         self.recognitionRequest = request
         
         let inputNode = engine.inputNode
-        let recordingFormat = inputNode.outputFormat(forBus: 0)
+        var recordingFormat = inputNode.outputFormat(forBus: 0)
+        if recordingFormat.sampleRate == 0 || recordingFormat.channelCount == 0 {
+            if let fallbackFormat = AVAudioFormat(standardFormatWithSampleRate: 44100, channels: 1) {
+                recordingFormat = fallbackFormat
+            }
+        }
         
         // Install tap to stream audio buffers directly into speech recognition
         inputNode.installTap(onBus: 0, bufferSize: 1024, format: recordingFormat) { [weak self] buffer, _ in
@@ -83,15 +82,17 @@ final class SpeechRecognitionService: ObservableObject {
                 
                 if let result = result {
                     let transcript = result.bestTranscription.formattedString
-                    self.latestTranscript = transcript
-                    
-                    let tokens = TextNormalizationService.tokenize(transcript)
-                    self.recentTokens = tokens
-                    self.onTokensUpdated?(tokens, result.isFinal)
+                    if transcript != self.latestTranscript || result.isFinal {
+                        self.latestTranscript = transcript
+                        let tokens = TextNormalizationService.tokenize(transcript)
+                        self.recentTokens = tokens
+                        self.onTokensUpdated?(tokens, result.isFinal)
+                    }
                 }
                 
                 if let error = error {
                     AppLogger.speech.error("Recognition task error: \(error.localizedDescription)")
+                    self.errorMessage = error.localizedDescription
                     // If error occurs while listening, stop cleanly
                     if self.isListening {
                         self.stopListening()

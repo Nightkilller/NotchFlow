@@ -9,7 +9,7 @@ struct SyncConfig: Sendable, Equatable {
     /// Number of words ahead of the confirmed position to search.
     var searchWindowAhead: Int = 40
     /// Number of consecutive partial results required to commit a forward advance.
-    var minConsecutiveConfirmations: Int = 2
+    var minConsecutiveConfirmations: Int = 1
     /// Minimum number of consecutive matched words required to allow a backward jump.
     var minBackwardConsecutiveWords: Int = 4
 }
@@ -70,6 +70,9 @@ final class ScriptMatchingService: @unchecked Sendable {
                 } else {
                     candidatePosition = bestMatchIndex
                     candidateStabilityCount = 1
+                    if candidateStabilityCount >= config.minConsecutiveConfirmations {
+                        commitPosition(bestMatchIndex)
+                    }
                 }
             }
         } else if bestMatchIndex < confirmedPosition {

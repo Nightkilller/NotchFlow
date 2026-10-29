@@ -70,7 +70,7 @@ struct ScriptMatchingServiceTests {
     @Test("Requires consecutive confirmations for partial results")
     func partialResultStability() {
         let script = createTestScript()
-        let matcher = ScriptMatchingService(initialPosition: 0)
+        let matcher = ScriptMatchingService(config: SyncConfig(minConsecutiveConfirmations: 2), initialPosition: 0)
         
         // First partial: candidate registered but not yet committed
         let p1 = matcher.processSpeechTokens(["welcome", "to"], in: script.allWords, isFinal: false)

@@ -41,6 +41,11 @@ struct Script: Identifiable, Sendable, Equatable, Codable {
         sections.flatMap(\.allWords)
     }
 
+    /// All sentences across all sections, in reading order.
+    var allSentences: [ScriptSentence] {
+        sections.flatMap(\.sentences)
+    }
+
     /// Total word count.
     var wordCount: Int {
         allWords.count

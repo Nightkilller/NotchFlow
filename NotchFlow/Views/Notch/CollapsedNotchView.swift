@@ -9,6 +9,11 @@ struct CollapsedNotchView: View {
     let onExpand: () -> Void
     let onClose: () -> Void
     
+    private var notchTopOffset: CGFloat {
+        let notchInfo = DisplayGeometryService.shared.currentNotchInfo
+        return notchInfo.hasNotch ? notchInfo.topSafeAreaHeight : 0
+    }
+    
     var body: some View {
         HStack(spacing: AppSpacing.md) {
             // Live Status Indicator Dot
@@ -72,16 +77,26 @@ struct CollapsedNotchView: View {
             .help("Close Teleprompter (Esc)")
         }
         .padding(.horizontal, AppSpacing.lg)
-        .padding(.vertical, AppSpacing.sm)
+        .padding(.top, notchTopOffset + 6)
+        .padding(.bottom, 8)
         .background(
-            RoundedRectangle(cornerRadius: AppSpacing.cornerRadiusLg)
-                .fill(AppColors.secondaryBackground)
-                .overlay(
-                    RoundedRectangle(cornerRadius: AppSpacing.cornerRadiusLg)
-                        .stroke(AppColors.border, lineWidth: 1)
+            UnevenRoundedRectangle(
+                topLeadingRadius: 0,
+                bottomLeadingRadius: 18,
+                bottomTrailingRadius: 18,
+                topTrailingRadius: 0
+            )
+            .fill(AppColors.secondaryBackground)
+            .overlay(
+                UnevenRoundedRectangle(
+                    topLeadingRadius: 0,
+                    bottomLeadingRadius: 18,
+                    bottomTrailingRadius: 18,
+                    topTrailingRadius: 0
                 )
-                .shadow(color: .black.opacity(0.35), radius: 10, y: 5)
+                .stroke(AppColors.border, lineWidth: 1)
+            )
+            .shadow(color: .black.opacity(0.45), radius: 12, y: 6)
         )
-        .frame(height: 48)
     }
 }

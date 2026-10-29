@@ -18,6 +18,14 @@ let package = Package(
             path: "NotchFlow",
             resources: [
                 .process("Resources")
+            ],
+            linkerSettings: [
+                .unsafeFlags([
+                    "-Xlinker", "-sectcreate",
+                    "-Xlinker", "__TEXT",
+                    "-Xlinker", "__info_plist",
+                    "-Xlinker", "Packaging/Info.plist"
+                ])
             ]
         ),
         .testTarget(

@@ -32,6 +32,7 @@ final class TeleprompterViewModel: ObservableObject {
     private var positionCancellable: AnyCancellable?
     private var simulationCancellable: AnyCancellable?
     private var speechCancellable: AnyCancellable?
+    private var speechErrorCancellable: AnyCancellable?
     
     // MARK: - Initialization
     
@@ -68,6 +69,13 @@ final class TeleprompterViewModel: ObservableObject {
             .sink { [weak self] listening in
                 self?.isListening = listening
             }
+            
+        // Listen to speech error messages
+        self.speechErrorCancellable = speech.$errorMessage
+            .compactMap { $0 }
+            .sink { [weak self] err in
+                self?.statusMessage = err
+            }
     }
     
     // MARK: - Computed Properties
@@ -78,6 +86,10 @@ final class TeleprompterViewModel: ObservableObject {
     
     var currentWordId: UUID? {
         currentWord?.id
+    }
+    
+    var currentSentenceId: UUID? {
+        positionService.currentSentence?.id
     }
     
     var currentWordDisplayIndex: Int {

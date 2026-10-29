@@ -153,28 +153,29 @@ final class NotchWindowController: NSWindowController {
     
     private func calculateFrame(for state: NotchWindowState) -> CGRect {
         let notchInfo = DisplayGeometryService.shared.currentNotchInfo
+        let notchTopInset = notchInfo.hasNotch ? notchInfo.topSafeAreaHeight : 0
         
         let width: CGFloat
         let height: CGFloat
         
         switch state {
         case .collapsed:
-            width = collapsedWidth
-            height = collapsedHeight
+            width = notchInfo.hasNotch ? max(collapsedWidth, notchInfo.notchFrame.width + 120) : collapsedWidth
+            height = collapsedHeight + notchTopInset
         case .expanded:
             if let vm = teleprompterViewModel {
                 width = vm.settings.readingAreaWidth
-                height = vm.settings.readingAreaHeight
+                height = vm.settings.readingAreaHeight + notchTopInset
             } else {
                 width = AppSpacing.teleprompterDefaultWidth
-                height = AppSpacing.teleprompterDefaultHeight
+                height = AppSpacing.teleprompterDefaultHeight + notchTopInset
             }
         case .closed:
             return .zero
         }
         
-        // Anchor directly to the notch area
-        return notchInfo.calculateWindowFrame(width: width, height: height, attachDirectlyToTop: false)
+        // Anchor directly to top edge of screen so window extends naturally from the physical notch
+        return notchInfo.calculateWindowFrame(width: width, height: height, attachDirectlyToTop: true)
     }
     
     private func repositionWindow() {

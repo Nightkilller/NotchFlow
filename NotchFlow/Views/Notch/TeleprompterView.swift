@@ -25,6 +25,31 @@ struct TeleprompterView: View {
                 Divider()
                     .background(AppColors.divider)
                 
+                // Status message banner (e.g. mic permission notice or error)
+                if let msg = viewModel.statusMessage {
+                    HStack(spacing: 6) {
+                        Image(systemName: "exclamationmark.triangle.fill")
+                            .font(.system(size: 11))
+                            .foregroundStyle(.yellow)
+                        Text(msg)
+                            .font(AppTypography.smallLabel)
+                            .foregroundStyle(AppColors.primaryText)
+                            .lineLimit(1)
+                        Spacer()
+                        Button {
+                            viewModel.statusMessage = nil
+                        } label: {
+                            Image(systemName: "xmark")
+                                .font(.system(size: 9))
+                                .foregroundStyle(AppColors.secondaryText)
+                        }
+                        .buttonStyle(.plain)
+                    }
+                    .padding(.horizontal, AppSpacing.lg)
+                    .padding(.vertical, 4)
+                    .background(Color.yellow.opacity(0.15))
+                }
+                
                 // MARK: Reading Surface
                 ZStack {
                     readingSurface
@@ -64,6 +89,11 @@ struct TeleprompterView: View {
                 onFontShrink: { viewModel.updateFontSize(delta: -2) }
             )
         )
+    }
+    
+    private var notchTopOffset: CGFloat {
+        let notchInfo = DisplayGeometryService.shared.currentNotchInfo
+        return notchInfo.hasNotch ? notchInfo.topSafeAreaHeight : 8
     }
     
     // MARK: - Header Bar
@@ -166,7 +196,8 @@ struct TeleprompterView: View {
             .help("Close Teleprompter (Esc)")
         }
         .padding(.horizontal, AppSpacing.lg)
-        .padding(.vertical, AppSpacing.md)
+        .padding(.top, notchTopOffset + AppSpacing.xs)
+        .padding(.bottom, AppSpacing.sm)
         .background(AppColors.secondaryBackground)
     }
     
@@ -175,10 +206,10 @@ struct TeleprompterView: View {
     private var readingSurface: some View {
         ScrollViewReader { proxy in
             ScrollView(.vertical, showsIndicators: false) {
-                VStack(alignment: .leading, spacing: AppSpacing.xl) {
+                LazyVStack(alignment: .leading, spacing: AppSpacing.lg) {
                     // Top breathing space
                     Spacer()
-                        .frame(height: 40)
+                        .frame(height: 24)
                     
                     ForEach(viewModel.script.sections) { section in
                         sectionView(section)
@@ -186,9 +217,9 @@ struct TeleprompterView: View {
                     
                     // Bottom padding for comfortable scrolling
                     Spacer()
-                        .frame(height: 120)
+                        .frame(height: 100)
                 }
-                .padding(.horizontal, AppSpacing.xxl)
+                .padding(.horizontal, AppSpacing.xl)
                 .frame(maxWidth: .infinity, alignment: .leading)
                 // Mirror / Flip text horizontally if enabled
                 .scaleEffect(x: viewModel.settings.mirrorText ? -1 : 1, y: 1)
@@ -198,19 +229,19 @@ struct TeleprompterView: View {
                 LinearGradient(
                     stops: [
                         .init(color: .clear, location: 0),
-                        .init(color: .black, location: 0.10),
-                        .init(color: .black, location: 0.90),
+                        .init(color: .black, location: 0.08),
+                        .init(color: .black, location: 0.92),
                         .init(color: .clear, location: 1.0)
                     ],
                     startPoint: .top,
                     endPoint: .bottom
                 )
             )
-            // Automatically keep current word visible and centered
-            .onChange(of: viewModel.currentWordId) { _, targetWordId in
-                if let targetId = targetWordId {
+            // Smoothly auto-scroll when active sentence changes
+            .onChange(of: viewModel.currentSentenceId) { _, sentenceId in
+                if let id = sentenceId {
                     withAnimation(AnimationConfig.viewportScroll) {
-                        proxy.scrollTo(targetId, anchor: .center)
+                        proxy.scrollTo(id, anchor: .center)
                     }
                 }
             }
@@ -221,6 +252,7 @@ struct TeleprompterView: View {
         VStack(alignment: .leading, spacing: AppSpacing.md) {
             ForEach(section.sentences) { sentence in
                 sentenceFlowView(sentence)
+                    .id(sentence.id)
             }
         }
     }

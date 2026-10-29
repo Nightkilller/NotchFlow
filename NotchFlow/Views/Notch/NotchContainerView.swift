@@ -63,11 +63,23 @@ struct NotchContainerView: View {
                 }
             }
         )
-        .clipShape(RoundedRectangle(cornerRadius: AppSpacing.cornerRadiusLg))
-        .overlay(
-            RoundedRectangle(cornerRadius: AppSpacing.cornerRadiusLg)
-                .stroke(AppColors.border, lineWidth: 1)
+        .clipShape(
+            UnevenRoundedRectangle(
+                topLeadingRadius: 0,
+                bottomLeadingRadius: AppSpacing.cornerRadiusLg,
+                bottomTrailingRadius: AppSpacing.cornerRadiusLg,
+                topTrailingRadius: 0
+            )
         )
-        .shadow(color: .black.opacity(0.45), radius: 16, y: 8)
+        .overlay(
+            UnevenRoundedRectangle(
+                topLeadingRadius: 0,
+                bottomLeadingRadius: AppSpacing.cornerRadiusLg,
+                bottomTrailingRadius: AppSpacing.cornerRadiusLg,
+                topTrailingRadius: 0
+            )
+            .stroke(AppColors.border, lineWidth: 1)
+        )
+        .shadow(color: .black.opacity(0.55), radius: 20, y: 10)
     }
 }
