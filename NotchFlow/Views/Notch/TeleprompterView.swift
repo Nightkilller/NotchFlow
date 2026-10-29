@@ -227,128 +227,106 @@ struct TeleprompterView: View {
     // MARK: - Header Bar
     
     private var headerBar: some View {
-        HStack {
-            Text(viewModel.script.title)
-                .font(AppTypography.settingsHeading)
-                .foregroundStyle(AppColors.primaryText)
-                .lineLimit(1)
+        HStack(spacing: AppSpacing.sm) {
+            // Script Title with clean icon
+            HStack(spacing: 5) {
+                Image(systemName: "doc.text.fill")
+                    .font(.system(size: 11))
+                    .foregroundStyle(AppColors.accent)
+                Text(viewModel.script.title.isEmpty ? "Untitled Script" : viewModel.script.title)
+                    .font(.system(size: 13, weight: .semibold))
+                    .foregroundStyle(AppColors.primaryText)
+                    .lineLimit(1)
+            }
+            .frame(maxWidth: 160, alignment: .leading)
             
             Spacer()
             
-            // Listening indicator if in voice-paced mode
-            if viewModel.isListening {
-                HStack(spacing: 4) {
-                    Image(systemName: "mic.fill")
-                        .font(.system(size: 11))
-                        .foregroundStyle(AppColors.accent)
-                    Text("Listening")
-                        .font(AppTypography.smallLabel)
-                        .foregroundStyle(AppColors.accent)
-                }
-                .padding(.horizontal, 6)
-                .padding(.vertical, 3)
-                .background(AppColors.accent.opacity(0.12))
-                .clipShape(Capsule())
-            }
-            
-            // Reading Mode Picker
+            // Reading Mode Picker (Voice | Auto | Manual) - sleek, small control size
             Picker("", selection: $viewModel.settings.readingMode) {
                 Text("Voice").tag(ReadingMode.voicePaced)
                 Text("Auto").tag(ReadingMode.autoScroll)
                 Text("Manual").tag(ReadingMode.manual)
             }
             .pickerStyle(.segmented)
-            .frame(width: 190)
+            .controlSize(.small)
+            .frame(width: 155)
             
-            // Simulation / Debug Mode Button
-            Button {
-                viewModel.toggleSimulation()
-            } label: {
-                HStack(spacing: 4) {
+            Spacer()
+            
+            // Right-aligned control group
+            HStack(spacing: 6) {
+                // Elapsed Time Display - NEVER wraps onto two lines
+                HStack(spacing: 3) {
+                    Image(systemName: "timer")
+                        .font(.system(size: 9))
+                    Text(viewModel.elapsedTimeFormatted)
+                        .font(.system(size: 11, weight: .medium, design: .monospaced))
+                        .lineLimit(1)
+                }
+                .foregroundStyle(AppColors.secondaryText)
+                .padding(.horizontal, 6)
+                .padding(.vertical, 3)
+                .background(AppColors.surfaceBackground)
+                .clipShape(RoundedRectangle(cornerRadius: AppSpacing.cornerRadiusSm))
+                .fixedSize(horizontal: true, vertical: true)
+                
+                // Simulation Button
+                Button {
+                    viewModel.toggleSimulation()
+                } label: {
                     Image(systemName: viewModel.isSimulating ? "sparkles" : "play.badge.sparkle")
                         .font(.system(size: 11))
-                    Text(viewModel.isSimulating ? "Simulating" : "Simulate")
-                        .font(AppTypography.smallLabel)
-                }
-                .foregroundStyle(viewModel.isSimulating ? AppColors.accent : AppColors.secondaryText)
-                .padding(.horizontal, AppSpacing.sm)
-                .padding(.vertical, 4)
-                .background(
-                    viewModel.isSimulating
-                        ? AppColors.accent.opacity(0.15)
-                        : AppColors.surfaceBackground
-                )
-                .clipShape(RoundedRectangle(cornerRadius: AppSpacing.cornerRadiusSm))
-            }
-            .buttonStyle(.plain)
-            .help("Debug mode: Simulates speech-paced reading without a microphone")
-            
-            // Elapsed Time Display
-            HStack(spacing: AppSpacing.xs) {
-                Image(systemName: "timer")
-                    .font(.system(size: 11))
-                Text(viewModel.elapsedTimeFormatted)
-                    .font(AppTypography.timerDisplay)
-            }
-            .foregroundStyle(AppColors.secondaryText)
-            .padding(.horizontal, AppSpacing.sm)
-            .padding(.vertical, AppSpacing.xxs)
-            .background(AppColors.surfaceBackground)
-            .clipShape(RoundedRectangle(cornerRadius: AppSpacing.cornerRadiusSm))
-            
-            // Debug HUD Button
-            Button {
-                viewModel.settings.showDebugHUD.toggle()
-            } label: {
-                Image(systemName: viewModel.settings.showDebugHUD ? "wrench.and.screwdriver.fill" : "wrench.and.screwdriver")
-                    .font(.system(size: 11, weight: .semibold))
-                    .foregroundStyle(viewModel.settings.showDebugHUD ? AppColors.accent : AppColors.secondaryText)
-                    .frame(width: 24, height: 24)
-            }
-            .buttonStyle(.plain)
-            .help("Toggle Alignment & Whisper Debug HUD (D)")
-            
-            // Pin / Lock Expanded Button
-            Button {
-                windowController.togglePinExpanded()
-            } label: {
-                Image(systemName: windowController.isPinnedExpanded ? "pin.fill" : "pin")
-                    .font(.system(size: 11, weight: .semibold))
-                    .foregroundStyle(windowController.isPinnedExpanded ? AppColors.accent : AppColors.secondaryText)
-                    .frame(width: 24, height: 24)
-            }
-            .buttonStyle(.plain)
-            .help(windowController.isPinnedExpanded ? "Unpin (Auto-collapse to 2 lines when cursor leaves)" : "Pin Controls Expanded")
-            
-            // Collapse Button (if hosted inside notch container)
-            if let onCollapse = onCollapse {
-                Button {
-                    onCollapse()
-                } label: {
-                    Image(systemName: "arrow.up.backward.and.arrow.down.forward")
-                        .font(.system(size: 12, weight: .semibold))
-                        .foregroundStyle(AppColors.secondaryText)
-                        .frame(width: 24, height: 24)
+                        .foregroundStyle(viewModel.isSimulating ? AppColors.accent : AppColors.secondaryText)
+                        .frame(width: 22, height: 22)
+                        .background(viewModel.isSimulating ? AppColors.accent.opacity(0.15) : AppColors.surfaceBackground)
+                        .clipShape(Circle())
                 }
                 .buttonStyle(.plain)
-                .help("Collapse to Notch Pill")
+                .help(viewModel.isSimulating ? "Stop Simulation" : "Simulate Speech (No Mic)")
+                
+                // Debug HUD Button
+                Button {
+                    viewModel.settings.showDebugHUD.toggle()
+                } label: {
+                    Image(systemName: viewModel.settings.showDebugHUD ? "wrench.and.screwdriver.fill" : "wrench.and.screwdriver")
+                        .font(.system(size: 11))
+                        .foregroundStyle(viewModel.settings.showDebugHUD ? AppColors.accent : AppColors.secondaryText)
+                        .frame(width: 22, height: 22)
+                }
+                .buttonStyle(.plain)
+                .help("Toggle Alignment & Whisper Debug HUD (D)")
+                
+                // Pin / Lock Expanded Button
+                Button {
+                    windowController.togglePinExpanded()
+                } label: {
+                    Image(systemName: windowController.isPinnedExpanded ? "pin.fill" : "pin")
+                        .font(.system(size: 11))
+                        .foregroundStyle(windowController.isPinnedExpanded ? AppColors.accent : AppColors.secondaryText)
+                        .frame(width: 22, height: 22)
+                }
+                .buttonStyle(.plain)
+                .help(windowController.isPinnedExpanded ? "Unpin (Auto-collapse when cursor leaves)" : "Pin Controls Expanded")
+                
+                // Close Button
+                Button {
+                    viewModel.pause()
+                    onDismiss()
+                } label: {
+                    Image(systemName: "xmark.circle.fill")
+                        .font(.system(size: 16))
+                        .foregroundStyle(AppColors.secondaryText)
+                        .frame(width: 22, height: 22)
+                }
+                .buttonStyle(.plain)
+                .help("Close Teleprompter (Esc)")
             }
-            
-            // Close / Exit Button
-            Button {
-                viewModel.pause()
-                onDismiss()
-            } label: {
-                Image(systemName: "xmark.circle.fill")
-                    .font(.system(size: 18))
-                    .foregroundStyle(AppColors.secondaryText)
-            }
-            .buttonStyle(.plain)
-            .help("Close Teleprompter (Esc)")
+            .fixedSize(horizontal: true, vertical: false)
         }
         .padding(.horizontal, AppSpacing.lg)
-        .padding(.top, notchTopOffset + AppSpacing.xs)
-        .padding(.bottom, AppSpacing.sm)
+        .padding(.top, notchTopOffset + 6)
+        .padding(.bottom, 6)
         .background(AppColors.secondaryBackground)
     }
     
@@ -634,6 +612,8 @@ struct TeleprompterView: View {
                         .font(AppTypography.timerDisplay)
                         .foregroundStyle(AppColors.primaryText)
                         .frame(width: 68)
+                        .lineLimit(1)
+                        .fixedSize(horizontal: true, vertical: true)
                     
                     Button {
                         viewModel.updateSpeed(delta: +10)
