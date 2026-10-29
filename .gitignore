@@ -1,0 +1,43 @@
+# NotchFlow - Xcode / Swift / macOS
+
+# Build artifacts
+.build/
+DerivedData/
+*.xcodeproj/project.xcworkspace/xcuserdata/
+*.xcodeproj/xcuserdata/
+*.xcworkspace/xcuserdata/
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# Swift Package Manager
+Packages/
+Package.resolved
+.swiftpm/
+
+# IDE
+*.pbxuser
+!default.pbxuser
+*.mode1v3
+!default.mode1v3
+*.mode2v3
+!default.mode2v3
+*.perspectivev3
+!default.perspectivev3
+xcuserdata/
+*.xccheckout
+*.xcscmblueprint
+
+# Cursor
+.cursor/
+
+# CocoaPods (not used, but just in case)
+Pods/
+
+# Temporary files
+*.swp
+*.swo
+*~
