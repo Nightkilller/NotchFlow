@@ -1,28 +1,30 @@
-# Notchyy-Teleprompter
+# NotchFlow Teleprompter
+
+<p align="center">
+  <img src="assets/banner.png" alt="NotchFlow Banner" width="100%">
+</p>
 
 A native macOS speech-synchronized teleprompter anchored directly to your MacBook display notch.
-
-![NotchFlow Banner](NotchFlow/Resources/AppInfo.json)
 
 ## What is NotchFlow?
 
 NotchFlow is a native macOS teleprompter designed specifically for Apple Silicon MacBooks. It positions an ultra-smooth, floating teleprompter window right below your display notch and camera so you can deliver natural, confident presentations while keeping direct eye contact with your audience.
 
-As you speak, NotchFlow follows your voice in real time using Apple's on-device speech framework. Each word illuminates in Spotify-style high-contrast orange, while past text softens and upcoming sentences remain crystal-clear.
+As you speak, NotchFlow follows your voice in real time using Apple's on-device speech framework and local Whisper inference. Each word illuminates in Spotify-style high-contrast orange, while past text softens and upcoming sentences remain crystal-clear.
 
 ---
 
 ## Key Features
 
-- **🎯 Display Notch Integration:** Accurately measures physical display geometry (`auxiliaryTopLeftArea` / `auxiliaryTopRightArea`) to position the teleprompter directly beneath the camera. Smoothly transitions between a minimal collapsed status pill and an expanded HUD.
+- **🎯 Display Notch Integration:** Accurately measures physical display geometry (`auxiliaryTopLeftArea` / `auxiliaryTopRightArea`) to position the teleprompter directly beneath the camera with seamless continuous rounded corners.
+- **✨ Auto-Shrink on Idle:** When you move your cursor away, NotchFlow auto-shrinks into an unobtrusive 2-line glance bar hugging the camera notch. When you hover over it, it smoothly expands to the full teleprompter view.
+- **↔️ Live Edge & Corner Resizing:** Drag any edge or corner (bottom, left, right, corners) with native cursor feedback to customize your reading area width (`380 pt – 950 pt`) and height (`180 pt – 650 pt`).
+- **🌓 Dynamic Dark / Light Themes:** One-click toggle between **Pure Black** (`#000000`) and **Clean Studio White** (`#FFFFFF`) themes with high-contrast typography and persistent preference storage.
 - **🎙️ Speech-Synchronized Tracking:** Leverages `SFSpeechRecognizer` and `AVAudioEngine` for low-latency word tracking. Uses Levenshtein distance matching and forward confirmation windows to prevent jitter.
 - **✨ Spotify-Style Word Highlighting:** Real-time visual feedback:
-  - **Completed Words:** Softened to 38% opacity.
-  - **Active Word:** Radiant accent orange with ambient glow and subtle scale.
-  - **Active Sentence:** Soft ambient container highlight.
-  - **Upcoming Words:** Crisp readable white.
-- **⚡ Pre-Start Countdown:** Configurable 3-second or 5-second countdown ("3... 2... 1... Speak!") to prepare you before voice tracking begins.
-- **👀 Eye-Level Reading Guide Line:** Subtle horizontal eye-level indicator with arrow guides placed right at the camera focal plane.
+  - **Completed Words:** Softened opacity.
+  - **Active Word:** Radiant accent orange (`#FF6B00`) with ambient glow and subtle pill background.
+  - **Upcoming Words:** Crisp readable white in dark mode / deep black in light mode.
 - **🪞 Beam-Splitter Mirror Mode:** One-click horizontal text flipping for physical teleprompter glass rigs.
 - **📄 Universal Document Import:** Paste directly or import `.txt`, `.md`, and `.pdf` documents with automated cleanup of markdown syntax, page numbers, and soft hyphenated line wraps.
 - **💾 Local-First Persistence:** Debounced autosave with JSON library persistence in `~/Library/Application Support/NotchFlow/`. Zero cloud, zero telemetry.
@@ -33,7 +35,8 @@ As you speak, NotchFlow follows your voice in real time using Apple's on-device 
   - `R` — Reset to beginning
   - `+` / `-` — Increase / decrease reading speed
   - `[` / `]` — Increase / decrease teleprompter font size
-  - `Esc` — Collapse to notch pill or dismiss
+  - `D` — Toggle developer debug HUD
+  - `Esc` — Collapse or dismiss
 - **📦 Packaged `.app` Bundle:** Fully packaged with `Info.plist` declaring camera-safe non-activating window HUD behavior and TCC permissions for Microphone and Speech Recognition.
 
 ---
@@ -48,7 +51,7 @@ As you speak, NotchFlow follows your voice in real time using Apple's on-device 
 
 ## Quick Start & Build Instructions
 
-### 1. Run Unit Tests (58 passing tests)
+### 1. Run Unit Tests (83 passing tests)
 ```bash
 ./build.sh test
 ```
