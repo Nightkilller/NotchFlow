@@ -26,12 +26,16 @@ case "${1:-build}" in
         echo "Packaging NotchFlow.app bundle..."
         bash ./scripts/package_app.sh
         ;;
+    dmg)
+        echo "Creating NotchFlow-Installer.dmg..."
+        bash ./scripts/create_dmg.sh
+        ;;
     clean)
         echo "Cleaning..."
         swift package clean
         ;;
     *)
-        echo "Usage: ./build.sh [build|run|test|release|package|clean]"
+        echo "Usage: ./build.sh [build|run|test|release|package|dmg|clean]"
         exit 1
         ;;
 esac

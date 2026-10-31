@@ -90,7 +90,13 @@ This produces `dist/NotchFlow.app` with embedded icons and resources ready to la
 open dist/NotchFlow.app
 ```
 
-### 4. Run Directly from Source
+### 4. Create Distributable DMG Installer (`NotchFlow-Installer.dmg`)
+```bash
+./build.sh dmg
+```
+This produces `dist/NotchFlow-Installer.dmg` ready for sharing and publishing on GitHub Releases.
+
+### 5. Run Directly from Source
 ```bash
 ./build.sh run
 ```
