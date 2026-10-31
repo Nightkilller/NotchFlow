@@ -11,7 +11,10 @@
   <img src="https://img.shields.io/badge/Tests-83%20Passing-22c55e" alt="Tests">
   <img src="https://img.shields.io/badge/Privacy-100%25%20On--Device-FF6B00" alt="Privacy">
   <img src="https://img.shields.io/badge/License-MIT-blue.svg" alt="License">
+  <a href="https://notchflow.vercel.app/"><img src="https://img.shields.io/badge/Website-notchflow.vercel.app-FF6B00?logo=vercel&logoColor=white" alt="Website"></a>
 </p>
+
+> 🌐 **Official Website & Demo:** [https://notchflow.vercel.app/](https://notchflow.vercel.app/)
 
 NotchFlow is a native macOS teleprompter designed for Apple Silicon MacBooks. It anchors directly beneath the camera notch, allowing presenters to maintain direct eye contact while tracking spoken words in real time.
 
