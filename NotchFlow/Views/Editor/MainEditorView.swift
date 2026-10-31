@@ -89,9 +89,7 @@ struct MainEditorView: View {
 
     private var titleBar: some View {
         HStack {
-            Image(systemName: "text.word.spacing")
-                .font(.system(size: 18, weight: .medium))
-                .foregroundStyle(AppColors.accent)
+            NotchFlowLogo(size: 16)
 
             Text("NotchFlow")
                 .font(AppTypography.editorSubtitle)

@@ -39,8 +39,12 @@ final class NotchWindowController: NSWindowController, ObservableObject {
     // MARK: - Properties
     
     @Published private(set) var windowState: NotchWindowState = .closed
-    @Published private(set) var isHoverExpanded: Bool = false
+    @Published private(set) var isHoverExpanded: Bool = true
     @Published private(set) var isPinnedExpanded: Bool = false
+    @Published private(set) var isResizing: Bool = false
+    
+    private var resizeStartWidth: CGFloat = 0
+    private var resizeStartHeight: CGFloat = 0
     
     private var teleprompterViewModel: TeleprompterViewModel?
     private var geometryCancellable: AnyCancellable?
@@ -50,8 +54,8 @@ final class NotchWindowController: NSWindowController, ObservableObject {
     // Geometry dimensions
     private let collapsedWidth: CGFloat = 340
     private let collapsedHeight: CGFloat = 52
-    /// Compact height calibrated for exactly 2 lines of teleprompter text hugging the notch
-    private let compactTwoLineHeight: CGFloat = 66
+    /// Compact height calibrated for teleprompter text hugging the notch when auto-shrunk
+    private let compactTwoLineHeight: CGFloat = 68
     
     // MARK: - Initialization
     
@@ -121,14 +125,20 @@ final class NotchWindowController: NSWindowController, ObservableObject {
         initialMode: NotchWindowState = .expanded,
         autoPlay: Bool = true
     ) {
-        self.isHoverExpanded = false
+        self.isHoverExpanded = true
         self.isPinnedExpanded = false
+        self.isResizing = false
         self.unhoverTimer?.cancel()
-        self.launchCooldown = true
+        self.launchCooldown = false
         
-        // Prevent accidental hover expansion immediately upon launch
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) { [weak self] in
-            self?.launchCooldown = false
+        // Auto-shrink after 3 seconds if user is not hovering over the teleprompter
+        DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) { [weak self] in
+            guard let self = self, !self.isPinnedExpanded, !self.isResizing else { return }
+            let mouseLoc = NSEvent.mouseLocation
+            if let win = self.window, !win.frame.contains(mouseLoc) {
+                self.isHoverExpanded = false
+                self.animateToCurrentFrame()
+            }
         }
         
         let vm = TeleprompterViewModel(script: script, settings: settings)
@@ -181,6 +191,7 @@ final class NotchWindowController: NSWindowController, ObservableObject {
     
     /// Toggles or updates hover expansion state smoothly.
     func setHovered(_ hovered: Bool) {
+        guard !isResizing else { return }
         unhoverTimer?.cancel()
         unhoverTimer = nil
         
@@ -193,14 +204,50 @@ final class NotchWindowController: NSWindowController, ObservableObject {
                 animateToCurrentFrame()
             }
         } else {
-            // Gentle 380ms debounce before collapsing so accidental cursor exits don't abruptly jitter
+            // Gentle 450ms debounce before auto-shrinking so accidental cursor exits don't abruptly jitter
             unhoverTimer = Just(())
-                .delay(for: .milliseconds(380), scheduler: RunLoop.main)
+                .delay(for: .milliseconds(450), scheduler: RunLoop.main)
                 .sink { [weak self] in
-                    guard let self = self, !self.isPinnedExpanded else { return }
+                    guard let self = self, !self.isPinnedExpanded, !self.isResizing else { return }
                     self.isHoverExpanded = false
                     self.animateToCurrentFrame()
                 }
+        }
+    }
+    
+    // MARK: - Edge Resizing
+    
+    func startResize() {
+        guard let vm = teleprompterViewModel else { return }
+        isResizing = true
+        unhoverTimer?.cancel()
+        unhoverTimer = nil
+        resizeStartWidth = vm.settings.readingAreaWidth
+        resizeStartHeight = vm.settings.readingAreaHeight
+    }
+    
+    func updateResize(deltaWidth: CGFloat, deltaHeight: CGFloat) {
+        guard let vm = teleprompterViewModel, let window = self.window else { return }
+        
+        let newWidth = max(380, min(950, resizeStartWidth + deltaWidth))
+        let newHeight = max(180, min(650, resizeStartHeight + deltaHeight))
+        
+        vm.settings.readingAreaWidth = newWidth
+        vm.settings.readingAreaHeight = newHeight
+        
+        let targetFrame = calculateFrame(for: .expanded)
+        window.setFrame(targetFrame, display: true)
+    }
+    
+    func endResize() {
+        isResizing = false
+        if let vm = teleprompterViewModel {
+            SettingsStorageService.save(vm.settings)
+        }
+        // Check if mouse is currently hovered
+        if let window = self.window {
+            let mouseLoc = NSEvent.mouseLocation
+            setHovered(window.frame.contains(mouseLoc))
         }
     }
     
@@ -252,15 +299,15 @@ final class NotchWindowController: NSWindowController, ObservableObject {
         case .expanded:
             if let vm = teleprompterViewModel {
                 width = vm.settings.readingAreaWidth
-                if isHoverExpanded || isPinnedExpanded {
+                if isHoverExpanded || isPinnedExpanded || isResizing {
                     height = vm.settings.readingAreaHeight + notchTopInset
                 } else {
-                    // Discreet 2-line mode directly beneath the physical notch
+                    // Auto-shrink to compact mode hugging the notch
                     height = compactTwoLineHeight + notchTopInset
                 }
             } else {
                 width = AppSpacing.teleprompterDefaultWidth
-                let effectiveH = (isHoverExpanded || isPinnedExpanded) ? AppSpacing.teleprompterDefaultHeight : compactTwoLineHeight
+                let effectiveH = (isHoverExpanded || isPinnedExpanded || isResizing) ? AppSpacing.teleprompterDefaultHeight : compactTwoLineHeight
                 height = effectiveH + notchTopInset
             }
         case .closed:

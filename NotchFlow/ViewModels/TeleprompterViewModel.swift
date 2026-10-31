@@ -275,8 +275,9 @@ final class TeleprompterViewModel: ObservableObject {
             if !self.permissionService.isFullyAuthorized {
                 let granted = await self.permissionService.requestPermissions()
                 guard granted else {
-                    self.statusMessage = "Microphone access is required for voice-paced reading. Switched to manual."
-                    self.settings.readingMode = .manual
+                    self.statusMessage = "Microphone access is required for voice-paced reading. Switched to auto-scroll."
+                    self.settings.readingMode = .autoScroll
+                    self.configureAutoScrollTimer()
                     return
                 }
             }
@@ -330,7 +331,8 @@ final class TeleprompterViewModel: ObservableObject {
                 
             } catch {
                 self.statusMessage = error.localizedDescription
-                self.settings.readingMode = .manual
+                self.settings.readingMode = .autoScroll
+                self.configureAutoScrollTimer()
             }
         }
     }

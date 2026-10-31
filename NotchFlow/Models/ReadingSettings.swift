@@ -22,13 +22,25 @@ struct ReadingSettings: Sendable, Equatable, Codable {
     /// Whether to mirror/flip text horizontally (for physical teleprompter setups).
     var mirrorText: Bool = false
     /// Pre-start countdown duration in seconds. 0 = no countdown.
-    var countdownSeconds: Int = 3
+    var countdownSeconds: Int = 0
     /// The reading mode.
     var readingMode: ReadingMode = .voicePaced
     /// The local speech recognition engine used for voice-paced synchronization.
     var speechEngine: SpeechEngineType = .whisper
     /// Whether to display the live development debug HUD panel.
     var showDebugHUD: Bool = false
+    /// Color theme for the teleprompter window (dark or light).
+    var theme: PrompterTheme = .dark
+}
+
+// MARK: - Prompter Theme
+
+/// Visual appearance theme for the teleprompter overlay.
+enum PrompterTheme: String, Sendable, Codable, CaseIterable, Identifiable {
+    case dark = "Dark"
+    case light = "Light"
+
+    var id: String { rawValue }
 }
 
 // MARK: - Speech Engine Type

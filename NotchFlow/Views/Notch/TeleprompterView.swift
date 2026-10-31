@@ -2,47 +2,36 @@ import SwiftUI
 
 // MARK: - Teleprompter Reading View
 
-/// The primary teleprompter display window featuring word-level visual synchronization,
-/// auto-scrolling viewport, playback controls, reading guide line, mirror mode,
-/// pre-start countdown, and keyboard navigation.
-///
-/// Features:
-/// - Compact 2-Line Notch Attachment: Seamlessly attaches flush beneath the MacBook camera notch,
-///   showing only 2 lines (active line + upcoming line) in a hidden-like unobtrusive presentation.
-/// - Automatic Line-by-Line Advance: When a line completes in word wrap, it automatically glides to the next line.
-/// - Hover Expansion: Hovering the cursor over the notch expands the full prompter controls HUD.
+/// Clean, professional notch teleprompter with:
+/// - Smooth continuous rounded corners (no rectangular black ear flaps or edges).
+/// - Dynamic Light/Dark theme switching (Pure Black ↔ Clean White).
+/// - Auto-shrink to compact 2-line mode when idle; smooth expansion on hover.
+/// - Full edge and corner live-resizing.
 struct TeleprompterView: View {
     @ObservedObject var viewModel: TeleprompterViewModel
     @ObservedObject private var windowController = NotchWindowController.shared
     let onDismiss: () -> Void
     var onCollapse: (() -> Void)? = nil
     
-    @SwiftUI.State private var showControlsHUD: Bool = true
-    
     private var isExpanded: Bool {
-        windowController.isHoverExpanded || windowController.isPinnedExpanded
+        windowController.isHoverExpanded || windowController.isPinnedExpanded || windowController.isResizing
+    }
+    
+    private var isLight: Bool {
+        viewModel.settings.theme == .light
     }
     
     private var notchTopOffset: CGFloat {
         let notchInfo = DisplayGeometryService.shared.currentNotchInfo
-        return notchInfo.hasNotch ? notchInfo.topSafeAreaHeight : 6
-    }
-    
-    private var compactFontSize: CGFloat {
-        18
-    }
-    
-    private var allWords: [ScriptWord] {
-        viewModel.script.allWords
+        return notchInfo.hasNotch ? max(notchInfo.topSafeAreaHeight, 6) : 6
     }
     
     private var lines: [ScriptLine] {
-        let maxWidth = viewModel.settings.readingAreaWidth - 48
-        let fontSize = isExpanded ? viewModel.settings.fontSize : compactFontSize
+        let maxWidth = viewModel.settings.readingAreaWidth - 64
         return ScriptLineWrapService.computeLines(
-            words: allWords,
+            words: viewModel.script.allWords,
             maxWidth: maxWidth,
-            fontSize: fontSize
+            fontSize: isExpanded ? viewModel.settings.fontSize : 20
         )
     }
     
@@ -54,23 +43,69 @@ struct TeleprompterView: View {
     }
     
     var body: some View {
-        ZStack {
-            // Dark reading backdrop
-            AppColors.primaryBackground
-                .ignoresSafeArea()
-            
+        ZStack(alignment: .top) {
+            // Main content layout: compact when auto-shrunk, full when expanded
             if isExpanded {
                 expandedPrompterContent
+                    .transition(.opacity)
             } else {
-                compactTwoLineView
+                compactReadingView
+                    .transition(.opacity)
+            }
+            
+            // Countdown badge if countdown is running
+            if let remaining = viewModel.countdownRemaining {
+                HStack(spacing: 6) {
+                    Circle()
+                        .fill(AppColors.accent)
+                        .frame(width: 8, height: 8)
+                    Text("Starting in \(remaining)...")
+                        .font(.system(size: 13, weight: .semibold))
+                        .foregroundStyle(isLight ? Color.black : Color.white)
+                }
+                .padding(.horizontal, 14)
+                .padding(.vertical, 6)
+                .background(isLight ? Color.white.opacity(0.95) : Color.black.opacity(0.85))
+                .clipShape(Capsule())
+                .overlay(Capsule().stroke(AppColors.accent.opacity(0.4), lineWidth: 1))
+                .padding(.top, notchTopOffset + 8)
+                .transition(.scale.combined(with: .opacity))
+            }
+            
+            // Optional Debug HUD overlay (toggled via 'D' key)
+            if viewModel.settings.showDebugHUD {
+                VStack {
+                    Spacer()
+                    TeleprompterDebugView(viewModel: viewModel)
+                        .padding(.bottom, 50)
+                }
+                .transition(.opacity)
+            }
+            
+            // Edge resize handles (active when expanded)
+            if isExpanded {
+                edgeResizeHandles
             }
         }
-        .preferredColorScheme(.dark)
-        // Expand controls when mouse hovers over the notch teleprompter, collapse when it leaves
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        // Theme background: Pure black in Dark mode, Clean white in Light mode
+        .background(isLight ? Color.white : Color.black)
+        // Smooth rounded rectangle: zero sharp rectangular corners or ear flaps
+        .clipShape(RoundedRectangle(cornerRadius: isExpanded ? 24 : 18, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: isExpanded ? 24 : 18, style: .continuous)
+                .stroke(isLight ? Color.black.opacity(0.09) : Color.white.opacity(0.11), lineWidth: 1)
+        )
+        .shadow(
+            color: Color.black.opacity(isLight ? 0.22 : 0.65),
+            radius: isExpanded ? 24 : 14,
+            y: isExpanded ? 10 : 5
+        )
+        // Hover monitoring: expands on hover, auto-shrinks when cursor leaves
         .onHover { isHovered in
             windowController.setHovered(isHovered)
         }
-        // Global keyboard handling for prompter navigation
+        // Global keyboard shortcuts
         .background(
             KeyboardNavigationHelper(
                 onSpace: { viewModel.togglePlayPause() },
@@ -87,25 +122,27 @@ struct TeleprompterView: View {
                 onToggleDebug: { viewModel.settings.showDebugHUD.toggle() }
             )
         )
+        .animation(.spring(response: 0.32, dampingFraction: 0.84), value: isExpanded)
     }
     
-    // MARK: - Compact 2-Line Notch Attachment View
+    // MARK: - Compact Reading View (Auto-Shrunk)
     
-    private var compactTwoLineView: some View {
+    private var compactReadingView: some View {
         let linesList = self.lines
         let currentIdx = self.activeLineIndex
         let currentLine = linesList.indices.contains(currentIdx) ? linesList[currentIdx] : nil
         let nextLine = linesList.indices.contains(currentIdx + 1) ? linesList[currentIdx + 1] : nil
         
-        return VStack(alignment: .leading, spacing: 4) {
+        return VStack(alignment: .leading, spacing: 3) {
             // Line 1: Active Reading Line
             if let current = currentLine {
-                HStack(spacing: 6) {
+                HStack(spacing: 5) {
                     ForEach(current.words) { word in
                         WordHighlightView(
                             word: word,
                             state: viewModel.visualState(for: word),
-                            fontSize: compactFontSize,
+                            fontSize: 20,
+                            theme: viewModel.settings.theme,
                             onTap: { viewModel.jumpToWord(at: word.globalIndex) }
                         )
                         .id(word.id)
@@ -118,41 +155,35 @@ struct TeleprompterView: View {
                 ))
                 .id("compact-line-\(current.id)")
             } else {
-                Text(viewModel.script.title)
-                    .font(AppTypography.teleprompterFont(size: compactFontSize))
-                    .foregroundStyle(AppColors.secondaryText)
+                Text(viewModel.script.title.isEmpty ? "NotchFlow Teleprompter" : viewModel.script.title)
+                    .font(.system(size: 18, weight: .bold))
+                    .foregroundStyle(isLight ? Color.black.opacity(0.8) : Color.white.opacity(0.8))
             }
             
-            // Line 2: Upcoming Next Line
+            // Line 2: Upcoming Preview Line
             if let next = nextLine {
-                HStack(spacing: 6) {
+                HStack(spacing: 5) {
                     ForEach(next.words) { word in
                         WordHighlightView(
                             word: word,
                             state: viewModel.visualState(for: word),
-                            fontSize: compactFontSize,
+                            fontSize: 15,
+                            theme: viewModel.settings.theme,
                             onTap: { viewModel.jumpToWord(at: word.globalIndex) }
                         )
                         .id(word.id)
                     }
                 }
-                .opacity(0.65)
+                .opacity(isLight ? 0.40 : 0.45)
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .transition(.asymmetric(
                     insertion: .move(edge: .bottom).combined(with: .opacity),
                     removal: .move(edge: .top).combined(with: .opacity)
                 ))
                 .id("compact-line-\(next.id)")
-            } else {
-                HStack(spacing: 4) {
-                    Text("• End of Script •")
-                        .font(.system(size: 11, weight: .medium, design: .rounded))
-                        .foregroundStyle(AppColors.secondaryText.opacity(0.45))
-                }
-                .frame(maxWidth: .infinity, alignment: .leading)
             }
         }
-        .padding(.horizontal, AppSpacing.xl)
+        .padding(.horizontal, 28)
         .padding(.top, notchTopOffset + 2)
         .padding(.bottom, 6)
         .animation(.spring(response: 0.32, dampingFraction: 0.86), value: currentIdx)
@@ -162,219 +193,84 @@ struct TeleprompterView: View {
     
     private var expandedPrompterContent: some View {
         VStack(spacing: 0) {
-            // Header Bar
-            headerBar
+            // Top notch bar with top-right timer
+            topBar
             
-            Divider()
-                .background(AppColors.divider)
+            // Scrolling teleprompter script content
+            scriptContentArea
             
-            // Status message banner
-            if let msg = viewModel.statusMessage {
-                HStack(spacing: 6) {
-                    Image(systemName: "exclamationmark.triangle.fill")
-                        .font(.system(size: 11))
-                        .foregroundStyle(.yellow)
-                    Text(msg)
-                        .font(AppTypography.smallLabel)
-                        .foregroundStyle(AppColors.primaryText)
-                        .lineLimit(1)
-                    Spacer()
-                    Button {
-                        viewModel.statusMessage = nil
-                    } label: {
-                        Image(systemName: "xmark")
-                            .font(.system(size: 9))
-                            .foregroundStyle(AppColors.secondaryText)
-                    }
-                    .buttonStyle(.plain)
-                }
-                .padding(.horizontal, AppSpacing.lg)
-                .padding(.vertical, 4)
-                .background(Color.yellow.opacity(0.15))
-            }
-            
-            // Reading Surface
-            ZStack {
-                readingSurface
-                
-                // Reading Guide Line Overlay
-                if viewModel.settings.showReadingGuide {
-                    readingGuideLine
-                }
-                
-                // Countdown Overlay (3... 2... 1... Speak!)
-                if let remaining = viewModel.countdownRemaining {
-                    countdownOverlay(seconds: remaining)
-                }
-            }
-            
-            Divider()
-                .background(AppColors.divider)
-            
-            // Bottom HUD Controls
-            controlsHUD
-            
-            // Debug HUD Overlay
-            if viewModel.settings.showDebugHUD {
-                TeleprompterDebugView(viewModel: viewModel)
-                    .padding(.horizontal, AppSpacing.lg)
-                    .padding(.bottom, 6)
-                    .transition(.move(edge: .bottom).combined(with: .opacity))
-            }
+            // Bottom controls: progress dots (left), indicator (center), circular buttons (right)
+            bottomControlsBar
         }
     }
     
-    // MARK: - Header Bar
+    // MARK: - Top Bar (Timer)
     
-    private var headerBar: some View {
-        HStack(spacing: AppSpacing.sm) {
-            // Script Title with clean icon
-            HStack(spacing: 5) {
-                Image(systemName: "doc.text.fill")
-                    .font(.system(size: 11))
-                    .foregroundStyle(AppColors.accent)
-                Text(viewModel.script.title.isEmpty ? "Untitled Script" : viewModel.script.title)
-                    .font(.system(size: 13, weight: .semibold))
-                    .foregroundStyle(AppColors.primaryText)
-                    .lineLimit(1)
-            }
-            .frame(maxWidth: 160, alignment: .leading)
-            
+    private var topBar: some View {
+        HStack {
             Spacer()
             
-            // Reading Mode Picker (Voice | Auto | Manual) - sleek, small control size
-            Picker("", selection: $viewModel.settings.readingMode) {
-                Text("Voice").tag(ReadingMode.voicePaced)
-                Text("Auto").tag(ReadingMode.autoScroll)
-                Text("Manual").tag(ReadingMode.manual)
-            }
-            .pickerStyle(.segmented)
-            .controlSize(.small)
-            .frame(width: 155)
-            
-            Spacer()
-            
-            // Right-aligned control group
-            HStack(spacing: 6) {
-                // Elapsed Time Display - NEVER wraps onto two lines
-                HStack(spacing: 3) {
-                    Image(systemName: "timer")
-                        .font(.system(size: 9))
-                    Text(viewModel.elapsedTimeFormatted)
-                        .font(.system(size: 11, weight: .medium, design: .monospaced))
-                        .lineLimit(1)
-                }
-                .foregroundStyle(AppColors.secondaryText)
-                .padding(.horizontal, 6)
-                .padding(.vertical, 3)
-                .background(AppColors.surfaceBackground)
-                .clipShape(RoundedRectangle(cornerRadius: AppSpacing.cornerRadiusSm))
-                .fixedSize(horizontal: true, vertical: true)
-                
-                // Simulation Button
-                Button {
-                    viewModel.toggleSimulation()
-                } label: {
-                    Image(systemName: viewModel.isSimulating ? "sparkles" : "play.badge.sparkle")
-                        .font(.system(size: 11))
-                        .foregroundStyle(viewModel.isSimulating ? AppColors.accent : AppColors.secondaryText)
-                        .frame(width: 22, height: 22)
-                        .background(viewModel.isSimulating ? AppColors.accent.opacity(0.15) : AppColors.surfaceBackground)
-                        .clipShape(Circle())
-                }
-                .buttonStyle(.plain)
-                .help(viewModel.isSimulating ? "Stop Simulation" : "Simulate Speech (No Mic)")
-                
-                // Debug HUD Button
-                Button {
-                    viewModel.settings.showDebugHUD.toggle()
-                } label: {
-                    Image(systemName: viewModel.settings.showDebugHUD ? "wrench.and.screwdriver.fill" : "wrench.and.screwdriver")
-                        .font(.system(size: 11))
-                        .foregroundStyle(viewModel.settings.showDebugHUD ? AppColors.accent : AppColors.secondaryText)
-                        .frame(width: 22, height: 22)
-                }
-                .buttonStyle(.plain)
-                .help("Toggle Alignment & Whisper Debug HUD (D)")
-                
-                // Pin / Lock Expanded Button
-                Button {
-                    windowController.togglePinExpanded()
-                } label: {
-                    Image(systemName: windowController.isPinnedExpanded ? "pin.fill" : "pin")
-                        .font(.system(size: 11))
-                        .foregroundStyle(windowController.isPinnedExpanded ? AppColors.accent : AppColors.secondaryText)
-                        .frame(width: 22, height: 22)
-                }
-                .buttonStyle(.plain)
-                .help(windowController.isPinnedExpanded ? "Unpin (Auto-collapse when cursor leaves)" : "Pin Controls Expanded")
-                
-                // Close Button
-                Button {
-                    viewModel.pause()
-                    onDismiss()
-                } label: {
-                    Image(systemName: "xmark.circle.fill")
-                        .font(.system(size: 16))
-                        .foregroundStyle(AppColors.secondaryText)
-                        .frame(width: 22, height: 22)
-                }
-                .buttonStyle(.plain)
-                .help("Close Teleprompter (Esc)")
-            }
-            .fixedSize(horizontal: true, vertical: false)
+            // Clean monospaced timer in the top-right corner
+            Text(viewModel.elapsedTimeFormatted)
+                .font(.system(size: 13, weight: .medium, design: .monospaced))
+                .foregroundStyle(isLight ? Color.black.opacity(0.55) : Color.white.opacity(0.60))
+                .monospacedDigit()
         }
-        .padding(.horizontal, AppSpacing.lg)
-        .padding(.top, notchTopOffset + 6)
-        .padding(.bottom, 6)
-        .background(AppColors.secondaryBackground)
+        .padding(.top, max(notchTopOffset, 6) + 4)
+        .padding(.trailing, 28)
+        .padding(.bottom, 2)
     }
     
-    // MARK: - Reading Surface
+    // MARK: - Script Content Area
     
-    private var readingSurface: some View {
+    private var scriptContentArea: some View {
         ScrollViewReader { proxy in
             ScrollView(.vertical, showsIndicators: false) {
-                LazyVStack(alignment: .leading, spacing: 10) {
+                LazyVStack(alignment: .leading, spacing: 8) {
+                    // Top padding so active line can scroll into the center
                     Spacer()
-                        .frame(height: 24)
+                        .frame(height: 20)
                     
-                    ForEach(lines) { line in
-                        HStack(spacing: 6) {
-                            ForEach(line.words) { word in
-                                WordHighlightView(
-                                    word: word,
-                                    state: viewModel.visualState(for: word),
-                                    fontSize: viewModel.settings.fontSize,
-                                    onTap: {
-                                        viewModel.jumpToWord(at: word.globalIndex)
-                                    }
-                                )
-                                .id(word.id)
+                    if lines.isEmpty {
+                        Text("No script text loaded. Open NotchFlow to write or import a script.")
+                            .font(.system(size: 16, weight: .medium))
+                            .foregroundStyle(isLight ? Color.black.opacity(0.45) : Color.white.opacity(0.50))
+                            .padding(.vertical, 30)
+                    } else {
+                        ForEach(lines) { line in
+                            HStack(spacing: 5) {
+                                ForEach(line.words) { word in
+                                    WordHighlightView(
+                                        word: word,
+                                        state: viewModel.visualState(for: word),
+                                        fontSize: viewModel.settings.fontSize,
+                                        theme: viewModel.settings.theme,
+                                        onTap: {
+                                            viewModel.jumpToWord(at: word.globalIndex)
+                                        }
+                                    )
+                                    .id(word.id)
+                                }
                             }
+                            .id("line-\(line.id)")
+                            .frame(maxWidth: .infinity, alignment: .leading)
                         }
-                        .id("expanded-line-\(line.id)")
-                        .padding(.horizontal, AppSpacing.sm)
-                        .padding(.vertical, 2)
-                        .background(
-                            RoundedRectangle(cornerRadius: AppSpacing.cornerRadiusSm)
-                                .fill(line.id == activeLineIndex ? AppColors.surfaceBackground.opacity(0.4) : Color.clear)
-                        )
                     }
                     
+                    // Bottom padding
                     Spacer()
-                        .frame(height: 100)
+                        .frame(height: 80)
                 }
-                .padding(.horizontal, AppSpacing.xl)
-                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.horizontal, 32)
                 .scaleEffect(x: viewModel.settings.mirrorText ? -1 : 1, y: 1)
             }
+            // Vertical edge fade mask for smooth readability
             .mask(
                 LinearGradient(
                     stops: [
                         .init(color: .clear, location: 0),
-                        .init(color: .black, location: 0.08),
-                        .init(color: .black, location: 0.92),
+                        .init(color: .black, location: 0.12),
+                        .init(color: .black, location: 0.88),
                         .init(color: .clear, location: 1.0)
                     ],
                     startPoint: .top,
@@ -384,256 +280,237 @@ struct TeleprompterView: View {
             // Smoothly auto-scroll line-by-line as active line progresses
             .onChange(of: activeLineIndex) { _, lineIdx in
                 withAnimation(AnimationConfig.viewportScroll) {
-                    proxy.scrollTo("expanded-line-\(lineIdx)", anchor: .center)
+                    proxy.scrollTo("line-\(lineIdx)", anchor: .center)
                 }
             }
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
     
-    // MARK: - Reading Guide Line (Eye-Level)
+    // MARK: - Bottom Controls Bar
     
-    private var readingGuideLine: some View {
-        GeometryReader { geo in
-            let guideY = geo.size.height * 0.38
-            HStack(spacing: AppSpacing.xs) {
-                Image(systemName: "chevron.right")
-                    .font(.system(size: 9, weight: .bold))
-                    .foregroundStyle(AppColors.accent.opacity(0.8))
+    private var bottomControlsBar: some View {
+        HStack(alignment: .center) {
+            // Progress dots (Left)
+            progressDots
+            
+            Spacer()
+            
+            // Home indicator / drag pill (Center)
+            Capsule()
+                .fill(isLight ? Color.black.opacity(0.18) : Color.white.opacity(0.18))
+                .frame(width: 32, height: 4)
+            
+            Spacer()
+            
+            // 4 Circular control buttons (Right)
+            HStack(spacing: 10) {
+                // Restart Button
+                circularButton(icon: "backward.end.fill") {
+                    viewModel.reset()
+                }
+                .help("Restart (R)")
                 
-                Rectangle()
-                    .fill(
-                        LinearGradient(
-                            colors: [
-                                AppColors.accent.opacity(0.4),
-                                AppColors.accent.opacity(0.1),
-                                AppColors.accent.opacity(0.4)
-                            ],
-                            startPoint: .leading,
-                            endPoint: .trailing
-                        )
-                    )
-                    .frame(height: 1)
+                // Theme Toggle Button (Light / Dark)
+                circularButton(
+                    icon: isLight ? "moon.fill" : "sun.max.fill",
+                    tint: isLight ? Color.black.opacity(0.80) : Color.white.opacity(0.85)
+                ) {
+                    withAnimation(.easeInOut(duration: 0.25)) {
+                        viewModel.settings.theme = (viewModel.settings.theme == .dark) ? .light : .dark
+                        SettingsStorageService.save(viewModel.settings)
+                    }
+                }
+                .help(isLight ? "Switch to Dark Theme" : "Switch to Light Theme")
                 
-                Image(systemName: "chevron.left")
-                    .font(.system(size: 9, weight: .bold))
-                    .foregroundStyle(AppColors.accent.opacity(0.8))
+                // Mic / Playback Toggle Button
+                circularButton(
+                    icon: viewModel.isPlaying ? "mic.fill" : "mic.slash.fill",
+                    tint: viewModel.isPlaying ? (isLight ? Color.black : Color.white) : (isLight ? Color.black.opacity(0.40) : Color.white.opacity(0.50))
+                ) {
+                    viewModel.togglePlayPause()
+                }
+                .help(viewModel.isPlaying ? "Pause (Space)" : "Start (Space)")
+                
+                // Close Button
+                circularButton(icon: "xmark") {
+                    onDismiss()
+                }
+                .help("Close (Esc)")
             }
-            .padding(.horizontal, AppSpacing.lg)
-            .position(x: geo.size.width / 2, y: guideY)
-            .allowsHitTesting(false)
+        }
+        .padding(.horizontal, 28)
+        .padding(.bottom, 16)
+        .padding(.top, 4)
+    }
+    
+    // MARK: - Circular Button Component
+    
+    private func circularButton(
+        icon: String,
+        tint: Color? = nil,
+        action: @escaping () -> Void
+    ) -> some View {
+        let buttonTint = tint ?? (isLight ? Color.black.opacity(0.80) : Color.white.opacity(0.85))
+        let buttonBg = isLight ? Color.black.opacity(0.07) : Color.white.opacity(0.12)
+        
+        return Button(action: action) {
+            Image(systemName: icon)
+                .font(.system(size: 13, weight: .semibold))
+                .foregroundStyle(buttonTint)
+                .frame(width: 32, height: 32)
+                .background(
+                    Circle()
+                        .fill(buttonBg)
+                )
+        }
+        .buttonStyle(.plain)
+    }
+    
+    // MARK: - Progress Dots Component
+    
+    private var progressDots: some View {
+        let totalDots = 14
+        let progress = max(0, min(1, viewModel.position.progress))
+        let filledCount = viewModel.totalWordsCount > 0 ? Int((progress * Double(totalDots)).rounded()) : 0
+        
+        let filledColor = isLight ? Color.black.opacity(0.75) : Color.white.opacity(0.75)
+        let emptyColor = isLight ? Color.black.opacity(0.18) : Color.white.opacity(0.20)
+        
+        return HStack(spacing: 4) {
+            ForEach(0..<totalDots, id: \.self) { index in
+                Circle()
+                    .fill(index < filledCount ? filledColor : emptyColor)
+                    .frame(width: 5, height: 5)
+            }
         }
     }
     
-    // MARK: - Countdown Overlay
+    // MARK: - Edge Resize Handles
     
-    private func countdownOverlay(seconds: Int) -> some View {
+    private var edgeResizeHandles: some View {
         ZStack {
-            Color.black.opacity(0.72)
-                .ignoresSafeArea()
-            
-            VStack(spacing: AppSpacing.sm) {
-                Text("\(seconds)")
-                    .font(.system(size: 72, weight: .heavy, design: .rounded))
-                    .foregroundStyle(AppColors.accent)
-                    .shadow(color: AppColors.accent.opacity(0.6), radius: 18)
-                    .transition(.scale.combined(with: .opacity))
-                    .id("countdown-\(seconds)")
-                
-                Text("Get Ready to Speak")
-                    .font(AppTypography.settingsHeading)
-                    .foregroundStyle(AppColors.primaryText)
-                
-                Button("Skip Countdown") {
-                    viewModel.play()
-                }
-                .buttonStyle(.plain)
-                .font(AppTypography.smallLabel)
-                .foregroundStyle(AppColors.secondaryText)
-                .padding(.top, AppSpacing.xs)
+            // Bottom edge handle (resize height)
+            VStack {
+                Spacer()
+                Rectangle()
+                    .fill(Color.white.opacity(0.001))
+                    .frame(height: 12)
+                    .onHover { h in
+                        if h { NSCursor.resizeUpDown.push() } else { NSCursor.pop() }
+                    }
+                    .gesture(
+                        DragGesture(minimumDistance: 1)
+                            .onChanged { value in
+                                if !windowController.isResizing {
+                                    windowController.startResize()
+                                }
+                                windowController.updateResize(deltaWidth: 0, deltaHeight: value.translation.height)
+                            }
+                            .onEnded { _ in
+                                windowController.endResize()
+                            }
+                    )
             }
-        }
-        .transition(.opacity)
-        .animation(AnimationConfig.standard, value: seconds)
-    }
-    
-    // MARK: - Controls HUD
-    
-    private var controlsHUD: some View {
-        VStack(spacing: AppSpacing.sm) {
-            // Progress Bar
-            GeometryReader { geo in
-                ZStack(alignment: .leading) {
-                    RoundedRectangle(cornerRadius: 2)
-                        .fill(AppColors.surfaceBackground)
-                        .frame(height: 4)
-                    
-                    RoundedRectangle(cornerRadius: 2)
-                        .fill(AppColors.accentGradient)
-                        .frame(
-                            width: max(0, geo.size.width * CGFloat(viewModel.position.progress)),
-                            height: 4
+            
+            // Left edge handle (resize width)
+            HStack {
+                Rectangle()
+                    .fill(Color.white.opacity(0.001))
+                    .frame(width: 14)
+                    .onHover { h in
+                        if h { NSCursor.resizeLeftRight.push() } else { NSCursor.pop() }
+                    }
+                    .gesture(
+                        DragGesture(minimumDistance: 1)
+                            .onChanged { value in
+                                if !windowController.isResizing {
+                                    windowController.startResize()
+                                }
+                                windowController.updateResize(deltaWidth: -value.translation.width * 2, deltaHeight: 0)
+                            }
+                            .onEnded { _ in
+                                windowController.endResize()
+                            }
+                    )
+                Spacer()
+            }
+            
+            // Right edge handle (resize width)
+            HStack {
+                Spacer()
+                Rectangle()
+                    .fill(Color.white.opacity(0.001))
+                    .frame(width: 14)
+                    .onHover { h in
+                        if h { NSCursor.resizeLeftRight.push() } else { NSCursor.pop() }
+                    }
+                    .gesture(
+                        DragGesture(minimumDistance: 1)
+                            .onChanged { value in
+                                if !windowController.isResizing {
+                                    windowController.startResize()
+                                }
+                                windowController.updateResize(deltaWidth: value.translation.width * 2, deltaHeight: 0)
+                            }
+                            .onEnded { _ in
+                                windowController.endResize()
+                            }
+                    )
+            }
+            
+            // Bottom-Right corner handle (resize width + height)
+            VStack {
+                Spacer()
+                HStack {
+                    Spacer()
+                    Rectangle()
+                        .fill(Color.white.opacity(0.001))
+                        .frame(width: 22, height: 22)
+                        .onHover { h in
+                            if h { NSCursor.resizeUpDown.push() } else { NSCursor.pop() }
+                        }
+                        .gesture(
+                            DragGesture(minimumDistance: 1)
+                                .onChanged { value in
+                                    if !windowController.isResizing {
+                                        windowController.startResize()
+                                    }
+                                    windowController.updateResize(deltaWidth: value.translation.width * 2, deltaHeight: value.translation.height)
+                                }
+                                .onEnded { _ in
+                                    windowController.endResize()
+                                }
                         )
                 }
             }
-            .frame(height: 4)
-            .padding(.horizontal, AppSpacing.lg)
             
-            // Voice Activity Cadence Meter & Live Feedback
-            if viewModel.settings.readingMode == .voicePaced && viewModel.isPlaying {
-                HStack(spacing: 8) {
-                    HStack(spacing: 5) {
-                        Circle()
-                            .fill(viewModel.isSpeaking ? Color.green : Color.orange)
-                            .frame(width: 7, height: 7)
-                            .scaleEffect(viewModel.isSpeaking ? 1.3 : 1.0)
-                            .animation(.spring(response: 0.2), value: viewModel.isSpeaking)
-                        
-                        Text(viewModel.isSpeaking ? "Speaking" : "Paused (Speak to advance)")
-                            .font(.system(size: 11, weight: .semibold, design: .rounded))
-                            .foregroundStyle(viewModel.isSpeaking ? Color.green : AppColors.secondaryText)
-                    }
-                    
-                    // Reactive audio level bar
-                    GeometryReader { barGeo in
-                        ZStack(alignment: .leading) {
-                            Capsule()
-                                .fill(AppColors.surfaceBackground)
-                                .frame(height: 4)
-                            Capsule()
-                                .fill(viewModel.isSpeaking ? Color.green : AppColors.accent)
-                                .frame(width: max(4, barGeo.size.width * CGFloat(viewModel.audioLevel)), height: 4)
-                                .animation(.easeOut(duration: 0.08), value: viewModel.audioLevel)
+            // Bottom-Left corner handle (resize width + height)
+            VStack {
+                Spacer()
+                HStack {
+                    Rectangle()
+                        .fill(Color.white.opacity(0.001))
+                        .frame(width: 22, height: 22)
+                        .onHover { h in
+                            if h { NSCursor.resizeUpDown.push() } else { NSCursor.pop() }
                         }
-                    }
-                    .frame(width: 48, height: 4)
-                    
-                    if !viewModel.latestTranscript.isEmpty {
-                        Text("• \"\(viewModel.latestTranscript)\"")
-                            .font(.system(size: 11, weight: .regular, design: .rounded))
-                            .foregroundStyle(AppColors.secondaryText)
-                            .lineLimit(1)
-                            .truncationMode(.head)
-                    }
+                        .gesture(
+                            DragGesture(minimumDistance: 1)
+                                .onChanged { value in
+                                    if !windowController.isResizing {
+                                        windowController.startResize()
+                                    }
+                                    windowController.updateResize(deltaWidth: -value.translation.width * 2, deltaHeight: value.translation.height)
+                                }
+                                .onEnded { _ in
+                                    windowController.endResize()
+                                }
+                        )
+                    Spacer()
                 }
-                .padding(.horizontal, AppSpacing.sm)
-                .padding(.vertical, 3)
-                .background(AppColors.surfaceBackground.opacity(0.85))
-                .clipShape(Capsule())
-            } else if viewModel.isListening && !viewModel.latestTranscript.isEmpty {
-                HStack(spacing: 6) {
-                    Image(systemName: "waveform")
-                        .font(.system(size: 10, weight: .semibold))
-                        .foregroundStyle(AppColors.accent)
-                    Text("Heard: \"\(viewModel.latestTranscript)\"")
-                        .font(.system(size: 11, weight: .medium, design: .rounded))
-                        .foregroundStyle(AppColors.primaryText)
-                        .lineLimit(1)
-                        .truncationMode(.head)
-                }
-                .padding(.horizontal, AppSpacing.sm)
-                .padding(.vertical, 2)
-                .background(AppColors.surfaceBackground.opacity(0.85))
-                .clipShape(Capsule())
             }
-            
-            // Primary Controls Row
-            HStack {
-                // Word count metrics
-                Text("Word \(viewModel.currentWordDisplayIndex) of \(viewModel.totalWordsCount) (\(viewModel.progressPercent)%)")
-                    .font(AppTypography.editorCaption)
-                    .foregroundStyle(AppColors.secondaryText)
-                
-                Spacer()
-                
-                // Navigation Buttons
-                HStack(spacing: AppSpacing.md) {
-                    // Reset
-                    Button {
-                        viewModel.reset()
-                    } label: {
-                        Image(systemName: "backward.end.fill")
-                            .font(.system(size: 14))
-                            .foregroundStyle(AppColors.secondaryText)
-                    }
-                    .buttonStyle(.plain)
-                    .help("Reset to Beginning (R)")
-                    
-                    // Step Backward
-                    Button {
-                        viewModel.stepBackward()
-                    } label: {
-                        Image(systemName: "backward.frame.fill")
-                            .font(.system(size: 16))
-                            .foregroundStyle(AppColors.primaryText)
-                    }
-                    .buttonStyle(.plain)
-                    .help("Previous Word (←)")
-                    
-                    // Play / Pause Toggle
-                    Button {
-                        viewModel.togglePlayPause()
-                    } label: {
-                        Image(systemName: (viewModel.isPlaying || viewModel.countdownRemaining != nil) ? "pause.circle.fill" : "play.circle.fill")
-                            .font(.system(size: 36))
-                            .foregroundStyle(AppColors.accent)
-                    }
-                    .buttonStyle(.plain)
-                    .help(viewModel.isPlaying ? "Pause (Space)" : "Play (Space)")
-                    
-                    // Step Forward
-                    Button {
-                        viewModel.stepForward()
-                    } label: {
-                        Image(systemName: "forward.frame.fill")
-                            .font(.system(size: 16))
-                            .foregroundStyle(AppColors.primaryText)
-                    }
-                    .buttonStyle(.plain)
-                    .help("Next Word (→)")
-                }
-                
-                Spacer()
-                
-                // Speed controls
-                HStack(spacing: AppSpacing.xs) {
-                    Button {
-                        viewModel.updateSpeed(delta: -10)
-                    } label: {
-                        Image(systemName: "minus")
-                            .font(.system(size: 10, weight: .bold))
-                            .frame(width: 20, height: 20)
-                            .background(AppColors.surfaceBackground)
-                            .clipShape(Circle())
-                    }
-                    .buttonStyle(.plain)
-                    .help("Decrease Speed (-)")
-                    
-                    Text("\(Int(viewModel.settings.autoScrollSpeed)) WPM")
-                        .font(AppTypography.timerDisplay)
-                        .foregroundStyle(AppColors.primaryText)
-                        .frame(width: 68)
-                        .lineLimit(1)
-                        .fixedSize(horizontal: true, vertical: true)
-                    
-                    Button {
-                        viewModel.updateSpeed(delta: +10)
-                    } label: {
-                        Image(systemName: "plus")
-                            .font(.system(size: 10, weight: .bold))
-                            .frame(width: 20, height: 20)
-                            .background(AppColors.surfaceBackground)
-                            .clipShape(Circle())
-                    }
-                    .buttonStyle(.plain)
-                    .help("Increase Speed (+)")
-                }
-                .foregroundStyle(AppColors.secondaryText)
-            }
-            .padding(.horizontal, AppSpacing.lg)
-            .padding(.bottom, AppSpacing.sm)
         }
-        .padding(.top, AppSpacing.sm)
-        .background(AppColors.secondaryBackground)
     }
 }
 

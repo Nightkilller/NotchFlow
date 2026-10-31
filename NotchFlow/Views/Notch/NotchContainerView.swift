@@ -25,61 +25,21 @@ struct NotchContainerView: View {
                 .transition(.scale(scale: 0.9).combined(with: .opacity))
                 
             case .expanded:
-                expandedPrompterView
-                    .transition(.scale(scale: 0.96).combined(with: .opacity))
+                TeleprompterView(
+                    viewModel: viewModel,
+                    onDismiss: onClose,
+                    onCollapse: {
+                        withAnimation(AnimationConfig.notchTransition) {
+                            state = .collapsed
+                        }
+                    }
+                )
+                .transition(.scale(scale: 0.96).combined(with: .opacity))
                 
             case .closed:
                 EmptyView()
             }
         }
         .animation(AnimationConfig.notchTransition, value: state)
-        .background(
-            KeyboardNavigationHelper(
-                onSpace: { viewModel.togglePlayPause() },
-                onLeft: { viewModel.stepBackward() },
-                onRight: { viewModel.stepForward() },
-                onUp: { viewModel.stepSentenceBackward() },
-                onDown: { viewModel.stepSentenceForward() },
-                onEscape: {
-                    if state == .expanded {
-                        state = .collapsed
-                    } else {
-                        onClose()
-                    }
-                }
-            )
-        )
-    }
-    
-    // MARK: - Expanded Prompter View
-    
-    private var expandedPrompterView: some View {
-        TeleprompterView(
-            viewModel: viewModel,
-            onDismiss: onClose,
-            onCollapse: {
-                withAnimation(AnimationConfig.notchTransition) {
-                    state = .collapsed
-                }
-            }
-        )
-        .clipShape(
-            UnevenRoundedRectangle(
-                topLeadingRadius: 0,
-                bottomLeadingRadius: AppSpacing.cornerRadiusLg,
-                bottomTrailingRadius: AppSpacing.cornerRadiusLg,
-                topTrailingRadius: 0
-            )
-        )
-        .overlay(
-            UnevenRoundedRectangle(
-                topLeadingRadius: 0,
-                bottomLeadingRadius: AppSpacing.cornerRadiusLg,
-                bottomTrailingRadius: AppSpacing.cornerRadiusLg,
-                topTrailingRadius: 0
-            )
-            .stroke(AppColors.border, lineWidth: 1)
-        )
-        .shadow(color: .black.opacity(0.55), radius: 20, y: 10)
     }
 }
