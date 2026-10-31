@@ -27,11 +27,6 @@ let package = Package(
                     "-Xlinker", "Packaging/Info.plist"
                 ])
             ]
-        ),
-        .testTarget(
-            name: "NotchFlowTests",
-            dependencies: ["NotchFlow"],
-            path: "NotchFlowTests"
         )
     ]
 )

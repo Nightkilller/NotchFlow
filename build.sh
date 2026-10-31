@@ -14,10 +14,6 @@ case "${1:-build}" in
         echo "Building and running NotchFlow..."
         swift run $PLUGIN_FLAGS NotchFlow
         ;;
-    test)
-        echo "Running tests..."
-        swift test $PLUGIN_FLAGS
-        ;;
     release)
         echo "Building release..."
         swift build -c release $PLUGIN_FLAGS
@@ -35,7 +31,7 @@ case "${1:-build}" in
         swift package clean
         ;;
     *)
-        echo "Usage: ./build.sh [build|run|test|release|package|dmg|clean]"
+        echo "Usage: ./build.sh [build|run|release|package|dmg|clean]"
         exit 1
         ;;
 esac

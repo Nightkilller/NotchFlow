@@ -77,11 +77,6 @@ As you speak, NotchFlow tracks your voice using low-latency on-device speech rec
 
 ## Build Instructions
 
-### Run Unit Tests
-```bash
-./build.sh test
-```
-
 ### Build Release Binary
 ```bash
 ./build.sh release
