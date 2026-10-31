@@ -12,6 +12,7 @@ DerivedData/
 # Large Model Weights (Downloaded on demand via scripts/download_model.sh)
 Models/*.bin
 *.bin
+*.dmg
 
 # macOS
 .DS_Store

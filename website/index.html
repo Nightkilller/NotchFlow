@@ -1,0 +1,536 @@
+<!doctype html>
+<html lang="en" dir="ltr" data-page="opencode">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>NotchFlow | The open source speech-synchronized teleprompter</title>
+
+    <meta name="description" content="NotchFlow is an open source speech-synchronized teleprompter anchored directly under your MacBook camera notch." />
+    <meta property="og:title" content="NotchFlow | The open source speech-synchronized teleprompter" />
+    <meta property="og:description" content="Never break eye contact on camera again. Built for Apple Silicon MacBooks." />
+    <meta property="og:image" content="./assets/banner.png" />
+    <meta property="og:type" content="website" />
+
+    <link rel="icon" type="image/png" href="./assets/logo.png" />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div data-component="container">
+      <!-- Top Sticky Navigation (OpenCode Style) -->
+      <section data-component="top">
+        <a href="#" class="brand-link">
+          <img src="./assets/logo.png" alt="NotchFlow" class="brand-logo-img" />
+          <span class="brand-name">NotchFlow</span>
+        </a>
+
+        <nav data-component="nav-desktop">
+          <ul>
+            <li>
+              <a href="https://github.com/Nightkilller/NotchFlow" target="_blank" rel="noopener">GitHub</a>
+            </li>
+            <li><a href="#features">Features</a></li>
+            <li><a href="#architecture">Architecture</a></li>
+            <li><a href="#faq">FAQ</a></li>
+            <li>
+              <a href="./downloads/NotchFlow-Installer.dmg" class="btn" data-slot="cta-button" download>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="square">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                  <polyline points="7 10 12 15 17 10"></polyline>
+                  <line x1="12" y1="15" x2="12" y2="3"></line>
+                </svg>
+                <span>Download DMG</span>
+              </a>
+            </li>
+          </ul>
+        </nav>
+
+        <button type="button" data-component="nav-mobile-toggle" id="mobileMenuToggle" aria-label="Toggle navigation">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="3" y1="12" x2="21" y2="12"></line>
+            <line x1="3" y1="6" x2="21" y2="6"></line>
+            <line x1="3" y1="18" x2="21" y2="18"></line>
+          </svg>
+        </button>
+      </section>
+
+      <!-- Mobile Navigation Dropdown -->
+      <div data-component="nav-mobile-menu" id="mobileMenu">
+        <ul>
+          <li><a href="#features">Features</a></li>
+          <li><a href="#architecture">Architecture</a></li>
+          <li><a href="#faq">FAQ</a></li>
+          <li><a href="https://github.com/Nightkilller/NotchFlow" target="_blank" rel="noopener">GitHub</a></li>
+          <li><a href="./downloads/NotchFlow-Installer.dmg" download>Download DMG (131 MB)</a></li>
+        </ul>
+      </div>
+
+      <!-- Main Content Flow -->
+      <div data-component="content">
+        <!-- Hero Section -->
+        <section data-component="hero">
+          <div data-slot="hero-copy">
+            <a href="https://github.com/Nightkilller/NotchFlow/releases/tag/v1.0.0" target="_blank" rel="noopener" data-slot="releases">
+              <span class="dot">●</span>
+              <span>v1.0.0 Now Available for macOS 14 & 15</span>
+              <span>→</span>
+            </a>
+
+            <h1>The open source speech-synchronized teleprompter for MacBook</h1>
+
+            <p>
+              NotchFlow anchors natively underneath your MacBook camera notch, tracking your voice in real time
+              so you maintain perfect eye contact with your camera. 100% on-device speech processing, zero cloud latency.
+            </p>
+
+            <div data-slot="hero-actions">
+              <a href="./downloads/NotchFlow-Installer.dmg" data-slot="primary-btn" download>
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="square">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                  <polyline points="7 10 12 15 17 10"></polyline>
+                  <line x1="12" y1="15" x2="12" y2="3"></line>
+                </svg>
+                <span>Download for macOS (DMG)</span>
+              </a>
+
+              <a href="https://github.com/Nightkilller/NotchFlow" target="_blank" rel="noopener" data-slot="secondary-btn">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
+                </svg>
+                <span>View on GitHub</span>
+              </a>
+            </div>
+
+            <!-- Terminal Tabs Installation Box (OpenCode signature) -->
+            <div data-slot="installation">
+              <div data-slot="installation-instructions">Quick install or download:</div>
+
+              <div data-component="tabs" id="installTabs">
+                <div data-slot="tablist" role="tablist">
+                  <button type="button" data-slot="tab" data-tab="dmg" role="tab" aria-selected="true">
+                    dmg (installer)
+                  </button>
+                  <button type="button" data-slot="tab" data-tab="brew" role="tab" aria-selected="false">
+                    brew
+                  </button>
+                  <button type="button" data-slot="tab" data-tab="git" role="tab" aria-selected="false">
+                    git clone
+                  </button>
+                  <button type="button" data-slot="tab" data-tab="curl" role="tab" aria-selected="false">
+                    curl
+                  </button>
+                </div>
+
+                <div data-slot="panels">
+                  <!-- DMG Tab -->
+                  <div data-slot="panel" data-panel="dmg" class="active">
+                    <button type="button" data-slot="command" id="downloadDmgTrigger" title="Click to download DMG">
+                      <span data-slot="command-script">
+                        <span data-slot="highlight">open</span> ./downloads/NotchFlow-Installer.dmg
+                        <span style="color: var(--color-text-weak); margin-left: 8px;">[131 MB • macOS 14 & 15]</span>
+                      </span>
+                      <span data-component="copy-status" id="dmgDownloadStatus">
+                        <span data-slot="copy">
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="7 10 12 15 17 10"></polyline>
+                            <line x1="12" y1="15" x2="12" y2="3"></line>
+                          </svg>
+                        </span>
+                        <span data-slot="check">
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="20 6 9 17 4 12"></polyline>
+                          </svg>
+                        </span>
+                      </span>
+                    </button>
+                  </div>
+
+                  <!-- Brew Tab -->
+                  <div data-slot="panel" data-panel="brew">
+                    <button type="button" data-slot="command" class="copyable-command" data-code="brew install --cask notchflow">
+                      <span data-slot="command-script">
+                        <span data-slot="highlight">brew</span> install --cask notchflow
+                      </span>
+                      <span data-component="copy-status">
+                        <span data-slot="copy">
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                          </svg>
+                        </span>
+                        <span data-slot="check">
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="20 6 9 17 4 12"></polyline>
+                          </svg>
+                        </span>
+                      </span>
+                    </button>
+                  </div>
+
+                  <!-- Git Tab -->
+                  <div data-slot="panel" data-panel="git">
+                    <button type="button" data-slot="command" class="copyable-command" data-code="git clone https://github.com/Nightkilller/NotchFlow.git">
+                      <span data-slot="command-script">
+                        <span data-slot="highlight">git clone</span> https://github.com/Nightkilller/NotchFlow.git
+                      </span>
+                      <span data-component="copy-status">
+                        <span data-slot="copy">
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                          </svg>
+                        </span>
+                        <span data-slot="check">
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="20 6 9 17 4 12"></polyline>
+                          </svg>
+                        </span>
+                      </span>
+                    </button>
+                  </div>
+
+                  <!-- Curl Tab -->
+                  <div data-slot="panel" data-panel="curl">
+                    <button type="button" data-slot="command" class="copyable-command" data-code="curl -fsSL https://raw.githubusercontent.com/Nightkilller/NotchFlow/main/install.sh | bash">
+                      <span data-slot="command-script">
+                        <span data-slot="highlight">curl -fsSL</span> https://raw.githubusercontent.com/.../install.sh | bash
+                      </span>
+                      <span data-component="copy-status">
+                        <span data-slot="copy">
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                          </svg>
+                        </span>
+                        <span data-slot="check">
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="20 6 9 17 4 12"></polyline>
+                          </svg>
+                        </span>
+                      </span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <div data-slot="installation-options">
+                Supports macOS 14.0+ (Sonoma) & macOS 15.0+ (Sequoia) • Requires Microphone permission for local speech recognition
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Video Showcase Section (OpenCode framed 16:9 video) -->
+        <section data-component="video" id="demo">
+          <video id="promoVideo" loop muted playsinline autoplay poster="./assets/banner.png">
+            <source src="./videos/overview.mp4" type="video/mp4" />
+            Your browser does not support the video tag.
+          </video>
+          <div class="video-overlay-bar">
+            <button class="video-action-btn" id="playBtn" title="Play / Pause" aria-label="Play or pause">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z"/>
+              </svg>
+            </button>
+            <button class="video-action-btn" id="muteBtn" title="Mute / Unmute" aria-label="Mute or unmute">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"/>
+              </svg>
+            </button>
+          </div>
+        </section>
+
+        <!-- "What is NotchFlow?" Section (OpenCode [*] bullet layout) -->
+        <section data-component="what" id="features">
+          <div data-slot="section-title">
+            <h3>What is NotchFlow?</h3>
+            <p>
+              NotchFlow is a native macOS teleprompter designed specifically for Apple Silicon MacBooks.
+              It locks seamlessly under the display notch and tracks your voice in real time so you never break eye contact.
+            </p>
+          </div>
+
+          <ul>
+            <li>
+              <span>[*]</span>
+              <div>
+                <strong>Speech Synchronization</strong>
+                <span>Matches your exact speaking cadence word-for-word, scrolling smoothly and holding when you pause.</span>
+              </div>
+            </li>
+            <li>
+              <span>[*]</span>
+              <div>
+                <strong>MacBook Notch Integration</strong>
+                <span>Snaps directly underneath the camera notch for an unnoticeable, hardware-native appearance.</span>
+              </div>
+            </li>
+            <li>
+              <span>[*]</span>
+              <div>
+                <strong>100% On-Device & Offline</strong>
+                <span>Processes your voice entirely on your Mac's Neural Engine. No network requests, zero telemetry.</span>
+              </div>
+            </li>
+            <li>
+              <span>[*]</span>
+              <div>
+                <strong>Dynamic Edge Drag Resizing</strong>
+                <span>Hover near the borders to smoothly resize the teleprompter window from 380px to 950px.</span>
+              </div>
+            </li>
+            <li>
+              <span>[*]</span>
+              <div>
+                <strong>Dark & Light High-Contrast Modes</strong>
+                <span>Instant toggle with crystal clear typography that stays easily readable over any desktop background.</span>
+              </div>
+            </li>
+            <li>
+              <span>[*]</span>
+              <div>
+                <strong>Smart Auto-Shrink on Idle</strong>
+                <span>Collapses gracefully into a minimal status pill whenever speaking stops or your cursor moves away.</span>
+              </div>
+            </li>
+          </ul>
+
+          <a href="./downloads/NotchFlow-Installer.dmg" download>
+            <span>Download NotchFlow (DMG)</span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M5 12h14M12 5l7 7-7 7"/>
+            </svg>
+          </a>
+        </section>
+
+        <!-- Technical Growth / Stats Section (OpenCode Fig 1, Fig 2, Fig 3, Fig 4) -->
+        <section data-component="growth" id="architecture">
+          <div data-slot="section-title">
+            <h3>Built natively for Apple Silicon & macOS</h3>
+            <p>
+              Engineered in 100% pure SwiftUI and Apple SpeechKit. Zero Electron bloat, negligible CPU footprint,
+              and instant sub-millisecond audio response.
+            </p>
+          </div>
+
+          <div data-component="growth-stats">
+            <div data-component="growth-stat">
+              <div class="stat-header">
+                <figure>Fig 1.</figure>
+                <strong>0ms Latency</strong>
+              </div>
+              <div class="stat-metric-number">0ms</div>
+              <p class="stat-metric-desc">Sub-millisecond audio phoneme evaluation running entirely on Apple Neural Engine.</p>
+              <div data-component="stat-illustration">
+                [ NEURAL ENGINE · LOCAL ]
+              </div>
+            </div>
+
+            <div data-component="growth-stat">
+              <div class="stat-header">
+                <figure>Fig 2.</figure>
+                <strong>Dynamic Width</strong>
+              </div>
+              <div class="stat-metric-number">380-950px</div>
+              <p class="stat-metric-desc">Smooth live edge drag resizing adapting to any script formatting or display size.</p>
+              <div data-component="stat-illustration">
+                |&lt;---- 380px .. 950px ----&gt;|
+              </div>
+            </div>
+
+            <div data-component="growth-stat">
+              <div class="stat-header">
+                <figure>Fig 3.</figure>
+                <strong>macOS Native</strong>
+              </div>
+              <div class="stat-metric-number">SwiftUI</div>
+              <p class="stat-metric-desc">Built for macOS 14 Sonoma and macOS 15 Sequoia with native windowing & transparency.</p>
+              <div data-component="stat-illustration">
+                [ APPLE SILICON M1-M4 ]
+              </div>
+            </div>
+
+            <div data-component="growth-stat">
+              <div class="stat-header">
+                <figure>Fig 4.</figure>
+                <strong>Open Source</strong>
+              </div>
+              <div class="stat-metric-number">MIT</div>
+              <p class="stat-metric-desc">100% free and open source. Fully inspectable, auditable, and hackable on GitHub.</p>
+              <div data-component="stat-illustration">
+                [ LICENSE: MIT · FREE ]
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Privacy Section (OpenCode privacy declaration) -->
+        <section data-component="privacy">
+          <div data-slot="privacy-title">
+            <div style="display: flex; gap: 12px; align-items: center; margin-bottom: 8px;">
+              <span style="color: var(--color-icon);">[*]</span>
+              <h3>Privacy Guarantee</h3>
+            </div>
+            <p>
+              Your voice and presentation scripts never leave your machine. NotchFlow operates entirely offline
+              using on-device Apple SpeechKit models. There are no accounts, no cloud endpoints, and no behavioral tracking.
+            </p>
+          </div>
+        </section>
+
+        <!-- FAQ Section (OpenCode accordion +/- style) -->
+        <section data-component="faq" id="faq">
+          <div data-slot="section-title">
+            <h3>Frequently Asked Questions</h3>
+            <p>Everything you need to know about installing and using NotchFlow.</p>
+          </div>
+
+          <ul>
+            <li class="faq-node" data-state="closed">
+              <button type="button" data-slot="faq-question">
+                <svg class="faq-icon" data-slot="faq-icon-plus" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M12 5v14M5 12h14"></path>
+                </svg>
+                <svg class="faq-icon" data-slot="faq-icon-minus" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M5 12h14"></path>
+                </svg>
+                <span data-slot="faq-question-text">Does NotchFlow work on notchless Macs or external displays?</span>
+              </button>
+              <div data-slot="faq-answer">
+                Yes. If your Mac does not feature a physical display notch (such as MacBook Pro 13", iMac, Mac Studio, or external monitors), NotchFlow anchors cleanly at the top center of the display with rounded corners and hardware bezel alignment.
+              </div>
+            </li>
+
+            <li class="faq-node" data-state="closed">
+              <button type="button" data-slot="faq-question">
+                <svg class="faq-icon" data-slot="faq-icon-plus" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M12 5v14M5 12h14"></path>
+                </svg>
+                <svg class="faq-icon" data-slot="faq-icon-minus" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M5 12h14"></path>
+                </svg>
+                <span data-slot="faq-question-text">How does the speech synchronization work without cloud servers?</span>
+              </button>
+              <div data-slot="faq-answer">
+                NotchFlow leverages macOS's native <code>SFSpeechRecognizer</code> framework configured with on-device processing enabled. It matches real-time speech phonemes against your loaded text buffer directly using the Apple Neural Engine.
+              </div>
+            </li>
+
+            <li class="faq-node" data-state="closed">
+              <button type="button" data-slot="faq-question">
+                <svg class="faq-icon" data-slot="faq-icon-plus" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M12 5v14M5 12h14"></path>
+                </svg>
+                <svg class="faq-icon" data-slot="faq-icon-minus" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M5 12h14"></path>
+                </svg>
+                <span data-slot="faq-question-text">How do I install the app from the DMG file?</span>
+              </button>
+              <div data-slot="faq-answer">
+                Download <code>NotchFlow-Installer.dmg</code>, double-click to mount the disk image, and drag <code>NotchFlow.app</code> into your macOS Applications folder. On first run, grant microphone permissions so the app can sync with your voice.
+              </div>
+            </li>
+
+            <li class="faq-node" data-state="closed">
+              <button type="button" data-slot="faq-question">
+                <svg class="faq-icon" data-slot="faq-icon-plus" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M12 5v14M5 12h14"></path>
+                </svg>
+                <svg class="faq-icon" data-slot="faq-icon-minus" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M5 12h14"></path>
+                </svg>
+                <span data-slot="faq-question-text">Is NotchFlow completely free and open source?</span>
+              </button>
+              <div data-slot="faq-answer">
+                Yes, NotchFlow is released under the permissive MIT license. You can inspect the source code, modify it, or build it yourself using Xcode or Swift Package Manager.
+              </div>
+            </li>
+          </ul>
+        </section>
+
+        <!-- Final Zen CTA Section (OpenCode style) -->
+        <section data-component="zen-cta">
+          <div data-slot="zen-cta-copy">
+            <strong>Ready to present with total confidence?</strong>
+            <p>
+              Download the standalone macOS installer DMG today and deliver flawless presentations with continuous eye contact.
+            </p>
+            <div style="display: flex; gap: 14px; flex-wrap: wrap;">
+              <a href="./downloads/NotchFlow-Installer.dmg" data-slot="primary-btn" download>
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                  <polyline points="7 10 12 15 17 10"></polyline>
+                  <line x1="12" y1="15" x2="12" y2="3"></line>
+                </svg>
+                <span>Download NotchFlow (DMG)</span>
+              </a>
+              <a href="https://github.com/Nightkilller/NotchFlow" target="_blank" rel="noopener" data-slot="secondary-btn">
+                <span>GitHub Repository</span>
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M5 12h14M12 5l7 7-7 7"/>
+                </svg>
+              </a>
+            </div>
+          </div>
+        </section>
+
+        <!-- Email Updates / Waitlist Section (Delivers to gutaadi@gmail.com) -->
+        <section data-component="email">
+          <div data-slot="section-title">
+            <h3>Get notified on new NotchFlow releases</h3>
+            <p>Join the community for updates, feature announcements, and macOS compatibility notes.</p>
+          </div>
+          <form data-slot="form" id="emailForm" action="https://formsubmit.co/gutaadi@gmail.com" method="POST">
+            <input type="hidden" name="_subject" value="New NotchFlow Waitlist Subscriber!" />
+            <input type="hidden" name="_captcha" value="false" />
+            <input type="hidden" name="_template" value="table" />
+            <input type="email" name="email" id="emailInput" placeholder="Enter your email address" aria-label="Email address" required />
+            <button type="submit" id="emailSubmitBtn">Subscribe</button>
+          </form>
+        </section>
+
+        <!-- Footer Grid Cells (OpenCode style) -->
+        <footer data-component="footer">
+          <div data-slot="cell">
+            <a href="https://github.com/Nightkilller/NotchFlow" target="_blank" rel="noopener">GitHub</a>
+          </div>
+          <div data-slot="cell">
+            <a href="https://github.com/Nightkilller/NotchFlow/releases" target="_blank" rel="noopener">
+              Releases <span>[v1.0.0]</span>
+            </a>
+          </div>
+          <div data-slot="cell">
+            <a href="./downloads/NotchFlow-Installer.dmg" download>
+              Download DMG <span>[131MB]</span>
+            </a>
+          </div>
+          <div data-slot="cell">
+            <a href="https://github.com/Nightkilller/NotchFlow/blob/main/README.md" target="_blank" rel="noopener">
+              Documentation
+            </a>
+          </div>
+          <div data-slot="cell">
+            <a href="https://github.com/Nightkilller/NotchFlow/blob/main/LICENSE" target="_blank" rel="noopener">
+              License <span>[MIT]</span>
+            </a>
+          </div>
+        </footer>
+      </div>
+
+      <!-- Legal & Copyright Bar -->
+      <div data-component="legal">
+        <span>© 2026 NotchFlow</span>
+        <a href="https://github.com/Nightkilller/NotchFlow" target="_blank" rel="noopener">GitHub</a>
+        <a href="https://github.com/Nightkilller/NotchFlow/releases" target="_blank" rel="noopener">Releases</a>
+        <a href="https://github.com/Nightkilller/NotchFlow/blob/main/LICENSE" target="_blank" rel="noopener">MIT License</a>
+      </div>
+
+      <!-- Subtle Patent-Style Watermark -->
+      <div class="patent-watermark">
+        <span>Created by Aditya Gupta with 🧠</span>
+      </div>
+    </div>
+
+    <script src="./script.js"></script>
+  </body>
+</html>

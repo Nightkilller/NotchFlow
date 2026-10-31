@@ -10,6 +10,7 @@
   <img src="https://img.shields.io/badge/Apple%20Silicon-M1%20%7C%20M2%20%7C%20M3%20%7C%20M4-555555" alt="Apple Silicon">
   <img src="https://img.shields.io/badge/Tests-83%20Passing-22c55e" alt="Tests">
   <img src="https://img.shields.io/badge/Privacy-100%25%20On--Device-FF6B00" alt="Privacy">
+  <img src="https://img.shields.io/badge/License-MIT-blue.svg" alt="License">
 </p>
 
 NotchFlow is a native macOS teleprompter designed for Apple Silicon MacBooks. It anchors directly beneath the camera notch, allowing presenters to maintain direct eye contact while tracking spoken words in real time.
@@ -101,3 +102,17 @@ This creates `dist/NotchFlow-Installer.dmg` with a drag-and-drop link to `/Appli
 - **Local Execution:** Audio processing, speech transcription, and script storage remain strictly on-device.
 - **Screen Capture Safe:** The window uses `NSWindow.sharingType = .readOnly` to ensure standard presentation behavior.
 - **Explicit Permissions:** System permissions for microphone access follow standard macOS Transparency, Consent, and Control (TCC) requirements.
+
+---
+
+## License
+
+This project is licensed under the **MIT License** — created by **Aditya Gupta**.
+
+You are free to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the software, commercially or privately, subject to retaining the original copyright notice:
+
+```
+Copyright (c) 2026 Aditya Gupta
+```
+
+See the full [LICENSE](LICENSE) file for details.
