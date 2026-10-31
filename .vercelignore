@@ -1,0 +1,10 @@
+Final_*.mp4
+*.dmg
+website/downloads/*.dmg
+NotchFlow/
+Packaging/
+dist/
+build/
+.build/
+DerivedData/
+Models/
