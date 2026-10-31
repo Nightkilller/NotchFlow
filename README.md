@@ -12,123 +12,97 @@
   <img src="https://img.shields.io/badge/Privacy-100%25%20On--Device-FF6B00" alt="Privacy">
 </p>
 
-A native macOS speech-synchronized teleprompter anchored directly to your MacBook display notch.
+NotchFlow is a native macOS teleprompter designed for Apple Silicon MacBooks. It anchors directly beneath the camera notch, allowing presenters to maintain direct eye contact while tracking spoken words in real time.
 
 ---
 
-## What is NotchFlow?
+## Overview
 
-**NotchFlow** is a native macOS teleprompter built specifically for Apple Silicon MacBooks. It positions an ultra-smooth, floating teleprompter window right beneath your display notch and camera so you can deliver natural, confident presentations while maintaining direct eye contact with your audience.
+Traditional teleprompters require dedicated hardware or place text far from the camera lens, breaking eye contact. NotchFlow solves this by positioning a floating reading pod directly below the MacBook camera notch.
 
-As you speak, NotchFlow follows your voice in real time using on-device speech recognition. Words illuminate in Spotify-lyrics style with vibrant orange accents, while past words soften and upcoming sentences remain crystal-clear.
+As you speak, NotchFlow tracks your voice using low-latency on-device speech recognition. Spoken words advance automatically, active words highlight in high-contrast orange, and completed text dims softly to keep your focus on upcoming sentences.
 
 ---
 
-## Key Features
+## Features
 
-- **🎯 Native Display Notch Integration:** Measures physical display geometry (`auxiliaryTopLeftArea` / `auxiliaryTopRightArea`) to anchor flush beneath the camera notch with smooth continuous rounded corners.
-- **✨ Auto-Shrink on Idle:** Moving your cursor away auto-shrinks the teleprompter into an unobtrusive 2-line glance bar hugging the camera notch. Hovering over it smoothly expands the full view.
-- **↔️ Live Edge & Corner Resizing:** Drag any edge or corner (bottom, left, right, corners) with native cursor feedback to customize width (`380 pt – 950 pt`) and height (`180 pt – 650 pt`). Dimensions are remembered across sessions.
-- **🌓 Dynamic Dark / Light Themes:** One-click toggle between **Pure Black** (`#000000`) and **Clean Studio White** (`#FFFFFF`) themes with high-contrast typography.
-- **🎙️ Speech-Synchronized Tracking:** Low-latency word-by-word tracking with Levenshtein distance matching and forward confirmation windows to prevent jitter.
-- **✨ Spotify-Style Word Highlighting:**
-  - **Completed Words:** Softened opacity.
-  - **Active Word:** Radiant accent orange (`#FF6B00`) with ambient glow and pill highlight.
-  - **Upcoming Words:** Crisp readable white in dark mode / deep black in light mode.
-- **🪞 Beam-Splitter Mirror Mode:** One-click horizontal text flipping for physical teleprompter glass rigs.
-- **📄 Universal Document Import:** Paste directly or import `.txt`, `.md`, and `.pdf` documents with automated cleanup of markdown syntax, page numbers, and soft hyphenated line wraps.
-- **💾 100% On-Device & Private:** Debounced autosave with JSON library persistence in `~/Library/Application Support/NotchFlow/`. Zero cloud, zero telemetry.
-- **⌨️ Pro Keyboard Shortcuts:**
-  - `Space` — Play / Pause
-  - `←` / `→` — Step backward / forward one word
-  - `↑` / `↓` — Jump backward / forward one sentence
-  - `R` — Reset to beginning
-  - `+` / `-` — Increase / decrease reading speed
-  - `[` / `]` — Increase / decrease teleprompter font size
-  - `D` — Toggle developer debug HUD
-  - `Esc` — Dismiss teleprompter
+- **Display Notch Alignment:** Aligns to the MacBook camera notch using display safe-area geometry, floating with continuous rounded corners.
+- **Idle Auto-Shrink:** Automatically collapses into a compact 2-line glance bar when the cursor leaves, preventing workspace obstruction. Expands smoothly upon hover.
+- **Edge and Corner Resizing:** Drag any border or corner to customize reading width (380 pt to 950 pt) and height (180 pt to 650 pt). Custom sizes are preserved across launches.
+- **Dark and Light Themes:** Toggle between Pure Black (`#000000`) and Studio White (`#FFFFFF`) themes via a single click.
+- **Voice-Paced Synchronization:** On-device speech recognition matches spoken words with forward confirmation windows and fuzzy matching to prevent jitter.
+- **Word Highlighting:**
+  - Completed words: Softened opacity.
+  - Active word: Accent orange highlight with subtle pill container.
+  - Upcoming words: High-contrast white (dark mode) or black (light mode).
+- **Document Import:** Import TXT, Markdown, and PDF documents with automated cleanup of markdown markers, page numbers, and line wraps.
+- **Mirror Mode:** Flip text horizontally for beam-splitter teleprompter glass setups.
+- **Private and Offline:** All text processing and speech recognition execute locally on your Mac. No network calls, telemetry, or third-party servers.
+
+---
+
+## Keyboard Shortcuts
+
+| Key | Action |
+|---|---|
+| `Space` | Play / Pause |
+| `Left Arrow` / `Right Arrow` | Step backward / forward one word |
+| `Up Arrow` / `Down Arrow` | Jump backward / forward one sentence |
+| `R` | Reset to start |
+| `+` / `-` | Increase / decrease reading speed |
+| `[` / `]` | Increase / decrease font size |
+| `D` | Toggle debug HUD |
+| `Escape` | Dismiss teleprompter |
 
 ---
 
 ## How to Use
 
-1. **Write or Import a Script:** Launch NotchFlow and write your presentation in the editor, or click **"Import Document..."** to import any TXT, PDF, or Markdown file.
-2. **Start Teleprompter:** Click **"Start Teleprompter"** to launch the teleprompter window right below your camera notch.
-3. **Present Naturally:** Speak at your natural pace—NotchFlow listens and highlights words in real time.
-4. **Auto-Shrink & Expand:** Move your mouse away to let it auto-shrink to an unobtrusive 2-line glance bar; hover over it anytime to expand full controls.
-5. **Switch Themes:** Click the **Sun/Moon** button in the bottom control bar to toggle between Dark (Pure Black) and Light (Studio White) themes.
-6. **Resize Anytime:** Move your cursor to any border or corner of the expanded prompter to drag and resize it to your preferred dimensions.
+1. **Create or Import a Script:** Write directly in the editor, or click **Import Document...** to load a TXT, Markdown, or PDF file.
+2. **Launch Teleprompter:** Click **Start Teleprompter** to anchor the prompter beneath the notch.
+3. **Present:** Speak at your natural pace; text tracks and highlights automatically.
+4. **Auto-Shrink:** Move your cursor away to let the window collapse into compact mode. Hover over it to restore the full control panel.
+5. **Switch Themes:** Use the theme toggle button in the bottom bar to switch between black and white modes.
+6. **Resize:** Drag any edge or corner to resize the window to your preferred dimensions.
 
 ---
 
 ## System Requirements
 
 - **Operating System:** macOS 14.0 (Sonoma), macOS 15.0 (Sequoia), or later.
-- **Hardware:** Apple Silicon Mac (M1/M2/M3/M4) recommended. Works on MacBook displays with notch as well as external monitors (centered fallback).
-- **Permissions:** Microphone access and Speech Recognition (prompted upon first session).
+- **Hardware:** Apple Silicon Mac (M1, M2, M3, M4).
+- **Permissions:** Microphone access for voice-paced tracking (requested on first launch).
 
 ---
 
-## Build & Test Instructions
+## Build Instructions
 
-### 1. Run Unit Tests (83 passing tests)
+### Run Unit Tests
 ```bash
 ./build.sh test
 ```
 
-### 2. Build Release Binary
+### Build Release Binary
 ```bash
 ./build.sh release
 ```
 
-### 3. Package Native macOS Application Bundle (`NotchFlow.app`)
+### Package Application Bundle
 ```bash
 ./build.sh package
 ```
-This produces `dist/NotchFlow.app` with embedded icons and resources ready to launch:
-```bash
-open dist/NotchFlow.app
-```
 
-### 4. Create Distributable DMG Installer (`NotchFlow-Installer.dmg`)
+### Build DMG Installer
 ```bash
 ./build.sh dmg
 ```
-This produces `dist/NotchFlow-Installer.dmg` ready for sharing and publishing on GitHub Releases.
 
-### 5. Run Directly from Source
-```bash
-./build.sh run
-```
+This creates `dist/NotchFlow-Installer.dmg` with a drag-and-drop link to `/Applications`.
 
 ---
 
-## Architecture Overview
+## Privacy and Security
 
-NotchFlow is built with Swift 6 and strict concurrency safety without external dependencies:
-
-```
-NotchFlow/
-├── App/                  # App entry point, AppDelegate lifecycle hooks
-├── Models/               # Script, ScriptSection, ScriptSentence, ScriptWord, ReadingSettings
-├── ViewModels/           # EditorViewModel, TeleprompterViewModel
-├── Views/
-│   ├── Editor/           # MainEditorView (Sidebar library, editor surface, live metrics)
-│   ├── Notch/            # NotchContainerView, CollapsedNotchView, TeleprompterView, WordHighlightView
-│   └── Settings/         # SettingsView (Typography, Notch dimensions, Playback defaults)
-├── Services/
-│   ├── Import/           # ScriptImportService, PDFImportService, MarkdownImportService, PlainTextImportService
-│   ├── Speech/           # SpeechRecognitionService, SpeechPermissionService, LocalWhisperService
-│   ├── Synchronization/  # ReadingPositionService, ScriptMatchingService, TextNormalizationService, ScriptStructuringService, ScriptLineWrapService
-│   └── Storage/          # ScriptStorageService, SettingsStorageService
-├── WindowManagement/     # NotchWindowController (NSPanel HUD), DisplayGeometryService
-└── DesignSystem/         # AppColors, AppTypography, AppSpacing, AnimationConfiguration, NotchFlowLogo
-```
-
----
-
-## Privacy & Security
-
-- **Strictly Local:** Scripts, preferences, and speech recognition occur on-device. No telemetry, third-party trackers, or servers.
-- **Capture Safe:** Teleprompter window uses `NSWindow.sharingType = .readOnly`, making it clean and standard for presentation workflows.
-- **Sandboxed TCC:** Requires explicit user authorization for microphone input and speech recognition via macOS System Settings.
+- **Local Execution:** Audio processing, speech transcription, and script storage remain strictly on-device.
+- **Screen Capture Safe:** The window uses `NSWindow.sharingType = .readOnly` to ensure standard presentation behavior.
+- **Explicit Permissions:** System permissions for microphone access follow standard macOS Transparency, Consent, and Control (TCC) requirements.

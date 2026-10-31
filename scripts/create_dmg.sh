@@ -48,3 +48,4 @@ rm -rf "$STAGING_DIR"
 echo "==> Success! DMG created at:"
 echo "    $DMG_PATH"
 echo "    Size: $(du -h "$DMG_PATH" | cut -f1)"
+
