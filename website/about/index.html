@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>About the Project — NotchFlow</title>
+    <meta name="description" content="Learn about the origins, development philosophy, and open-source architecture behind NotchFlow, a native macOS teleprompter by Aditya Gupta." />
+    <meta property="og:title" content="About the Project — NotchFlow" />
+    <meta property="og:description" content="Learn about the origins, development philosophy, and open-source architecture behind NotchFlow, a native macOS teleprompter by Aditya Gupta." />
+    <meta property="og:image" content="https://notchflow.vercel.app/assets/banner.png" />
+    <meta property="og:url" content="https://notchflow.vercel.app/about/" />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="About the Project — NotchFlow" />
+    <meta name="twitter:description" content="Learn about the origins, development philosophy, and open-source architecture behind NotchFlow, a native macOS teleprompter by Aditya Gupta." />
+    <meta name="twitter:image" content="https://notchflow.vercel.app/assets/banner.png" />
+    <link rel="canonical" href="https://notchflow.vercel.app/about/" />
+    <link rel="icon" type="image/png" href="/assets/logo.png" />
+    <link rel="stylesheet" href="/styles.css" />
+    <link rel="stylesheet" href="/page.css" />
+    <!-- Google AdSense -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4982175209260588"
+         crossorigin="anonymous"></script>
+
+  </head>
+  <body>
+    <div data-component="container">
+      <!-- Navigation -->
+      <section data-component="top">
+        <a href="/" class="brand-link">
+          <img src="/assets/logo.png" alt="NotchFlow" class="brand-logo-img" />
+          <span class="brand-name">NotchFlow</span>
+        </a>
+        <nav data-component="nav-desktop">
+          <ul>
+            <li><a href="/features">Features</a></li>
+            <li><a href="/docs">Docs</a></li>
+            <li><a href="/blog">Blog</a></li>
+            <li><a href="/faq">FAQ</a></li>
+            <li><a href="/about">About</a></li>
+            <li>
+              <a href="/downloads/NotchFlow-Installer.dmg" class="btn" data-slot="cta-button" download>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                  <polyline points="7 10 12 15 17 10"></polyline>
+                  <line x1="12" y1="15" x2="12" y2="3"></line>
+                </svg>
+                <span>Download DMG</span>
+              </a>
+            </li>
+          </ul>
+        </nav>
+        <button type="button" data-component="nav-mobile-toggle" id="mobileMenuToggle" aria-label="Toggle navigation">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="3" y1="12" x2="21" y2="12"></line>
+            <line x1="3" y1="6" x2="21" y2="6"></line>
+            <line x1="3" y1="18" x2="21" y2="18"></line>
+          </svg>
+        </button>
+      </section>
+
+      <!-- Mobile Dropdown Menu -->
+      <div data-component="nav-mobile-menu" id="mobileMenu">
+        <ul>
+          <li><a href="/">Home</a></li>
+          <li><a href="/features">Features</a></li>
+          <li><a href="/docs">Docs</a></li>
+          <li><a href="/blog">Blog</a></li>
+          <li><a href="/faq">FAQ</a></li>
+          <li><a href="/about">About</a></li>
+          <li><a href="/contact">Contact</a></li>
+          <li><a href="https://github.com/Nightkilller/NotchFlow" target="_blank" rel="noopener">GitHub</a></li>
+          <li><a href="/downloads/NotchFlow-Installer.dmg" download>Download DMG</a></li>
+        </ul>
+      </div>
+
+      <div data-component="content">
+        <section class="page-header">
+          <nav class="breadcrumb" aria-label="Breadcrumb">
+            <a href="/">Home</a> <span class="sep">/</span> <span class="current">About</span>
+          </nav>
+          <h1>About NotchFlow</h1>
+          <p class="subtitle">The open source project bringing voice-synchronized teleprompting natively to macOS.</p>
+        </section>
+
+        <section class="content-section">
+          <div class="prose">
+            <h2>Why NotchFlow Exists</h2>
+            <p>
+              In modern remote communication—whether presenting quarterly business reviews, teaching online courses, pitching investors, or recording product demos—eye contact conveys credibility, confidence, and warmth. However, traditional presentation setups force a difficult compromise: you either memorize a script, look down at notes on your desk, or read from a window far away from your Mac's camera lens.
+            </p>
+            <p>
+              Commercial teleprompter rigs are bulky, expensive, and require dedicated hardware accessories. Software alternatives are often bloated Electron applications with monthly subscriptions, cloud dependencies, and noticeable speech lag.
+            </p>
+            <p>
+              NotchFlow was created by <strong>Aditya Gupta</strong> as an open-source, native macOS application designed from the ground up for Apple Silicon MacBooks. By positioning a lightweight reading pod directly under the physical display camera notch and running voice transcription locally via Apple Neural Engine, NotchFlow makes natural eye contact effortless and accessible to everyone.
+            </p>
+
+            <h2>Core Development Philosophy</h2>
+            <ul>
+              <li><strong>Native Architecture:</strong> Built purely with Swift 6 and SwiftUI. NotchFlow boots instantly, consumes minimal memory, and integrates seamlessly with macOS desktop spaces and window management.</li>
+              <li><strong>Zero Cloud Dependency:</strong> Your words and scripts belong to you. Transcription executes strictly on-device using Apple SpeechKit APIs. NotchFlow operates completely offline without network permissions.</li>
+              <li><strong>Free & Open Source:</strong> Released under the permissive MIT License. The code is transparent, auditable, and community-driven on <a href="https://github.com/Nightkilller/NotchFlow" target="_blank" rel="noopener">GitHub</a>.</li>
+              <li><strong>Minimalist Ergonomics:</strong> The interface stays out of your way. With idle auto-shrink and edge resizing, NotchFlow provides an unobtrusive reading guide that expands only when you need it.</li>
+            </ul>
+
+            <h2>Project Details</h2>
+            <table>
+              <tr>
+                <th>Creator & Maintainer</th>
+                <td>Aditya Gupta</td>
+              </tr>
+              <tr>
+                <th>License</th>
+                <td>MIT License (Free for personal and commercial use)</td>
+              </tr>
+              <tr>
+                <th>Repository</th>
+                <td><a href="https://github.com/Nightkilller/NotchFlow" target="_blank" rel="noopener">github.com/Nightkilller/NotchFlow</a></td>
+              </tr>
+              <tr>
+                <th>Target Platforms</th>
+                <td>macOS 14.0 (Sonoma) & macOS 15.0 (Sequoia) on Apple Silicon (M1/M2/M3/M4)</td>
+              </tr>
+              <tr>
+                <th>Primary Contact</th>
+                <td><a href="mailto:gutaadi@gmail.com">gutaadi@gmail.com</a></td>
+              </tr>
+            </table>
+
+            <h2>Get Involved</h2>
+            <p>
+              Whether you are submitting bug reports, contributing Swift code improvements, suggesting new presentation tools, or improving documentation, contributions are welcome on our <a href="https://github.com/Nightkilller/NotchFlow/issues" target="_blank" rel="noopener">GitHub Issues tracker</a>.
+            </p>
+          </div>
+        </section>
+      </div>
+
+      <!-- Footer -->
+      <footer data-component="footer">
+        <div data-slot="cell"><a href="/features">Features</a></div>
+        <div data-slot="cell"><a href="/docs">Docs</a></div>
+        <div data-slot="cell"><a href="/blog">Blog</a></div>
+        <div data-slot="cell"><a href="/faq">FAQ</a></div>
+        <div data-slot="cell"><a href="/about">About</a></div>
+      </footer>
+
+      <!-- Legal & Copyright Bar -->
+      <div data-component="legal">
+        <span>&copy; 2026 NotchFlow</span>
+        <a href="/privacy-policy">Privacy Policy</a>
+        <a href="/terms">Terms</a>
+        <a href="/contact">Contact</a>
+        <a href="https://github.com/Nightkilller/NotchFlow" target="_blank" rel="noopener">GitHub</a>
+      </div>
+
+      <!-- Subtle Patent-Style Watermark -->
+      <div class="patent-watermark">
+        <span>Created by Aditya Gupta with 🧠</span>
+      </div>
+    </div>
+
+    <script>
+      const t = document.getElementById('mobileMenuToggle');
+      const m = document.getElementById('mobileMenu');
+      if (t && m) {
+        t.addEventListener('click', () => m.classList.toggle('active'));
+        m.querySelectorAll('a').forEach(a => a.addEventListener('click', () => m.classList.remove('active')));
+      }
+    </script>
+  </body>
+</html>

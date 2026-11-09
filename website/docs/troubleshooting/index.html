@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Troubleshooting Guide — NotchFlow</title>
+    <meta name="description" content="Diagnose and resolve common issues with speech recognition, microphone permissions, Gatekeeper alerts, and window alignment in NotchFlow." />
+    <meta property="og:title" content="Troubleshooting Guide — NotchFlow" />
+    <meta property="og:description" content="Diagnose and resolve common issues with speech recognition, microphone permissions, Gatekeeper alerts, and window alignment in NotchFlow." />
+    <meta property="og:image" content="https://notchflow.vercel.app/assets/banner.png" />
+    <meta property="og:url" content="https://notchflow.vercel.app/docs/troubleshooting/" />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Troubleshooting Guide — NotchFlow" />
+    <meta name="twitter:description" content="Diagnose and resolve common issues with speech recognition, microphone permissions, Gatekeeper alerts, and window alignment in NotchFlow." />
+    <meta name="twitter:image" content="https://notchflow.vercel.app/assets/banner.png" />
+    <link rel="canonical" href="https://notchflow.vercel.app/docs/troubleshooting/" />
+    <link rel="icon" type="image/png" href="/assets/logo.png" />
+    <link rel="stylesheet" href="/styles.css" />
+    <link rel="stylesheet" href="/page.css" />
+    <!-- Google AdSense -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4982175209260588"
+         crossorigin="anonymous"></script>
+
+  </head>
+  <body>
+    <div data-component="container">
+      <!-- Navigation -->
+      <section data-component="top">
+        <a href="/" class="brand-link">
+          <img src="/assets/logo.png" alt="NotchFlow" class="brand-logo-img" />
+          <span class="brand-name">NotchFlow</span>
+        </a>
+        <nav data-component="nav-desktop">
+          <ul>
+            <li><a href="/features">Features</a></li>
+            <li><a href="/docs">Docs</a></li>
+            <li><a href="/blog">Blog</a></li>
+            <li><a href="/faq">FAQ</a></li>
+            <li><a href="/about">About</a></li>
+            <li>
+              <a href="/downloads/NotchFlow-Installer.dmg" class="btn" data-slot="cta-button" download>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                  <polyline points="7 10 12 15 17 10"></polyline>
+                  <line x1="12" y1="15" x2="12" y2="3"></line>
+                </svg>
+                <span>Download DMG</span>
+              </a>
+            </li>
+          </ul>
+        </nav>
+        <button type="button" data-component="nav-mobile-toggle" id="mobileMenuToggle" aria-label="Toggle navigation">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="3" y1="12" x2="21" y2="12"></line>
+            <line x1="3" y1="6" x2="21" y2="6"></line>
+            <line x1="3" y1="18" x2="21" y2="18"></line>
+          </svg>
+        </button>
+      </section>
+
+      <!-- Mobile Dropdown Menu -->
+      <div data-component="nav-mobile-menu" id="mobileMenu">
+        <ul>
+          <li><a href="/">Home</a></li>
+          <li><a href="/features">Features</a></li>
+          <li><a href="/docs">Docs</a></li>
+          <li><a href="/blog">Blog</a></li>
+          <li><a href="/faq">FAQ</a></li>
+          <li><a href="/about">About</a></li>
+          <li><a href="/contact">Contact</a></li>
+          <li><a href="https://github.com/Nightkilller/NotchFlow" target="_blank" rel="noopener">GitHub</a></li>
+          <li><a href="/downloads/NotchFlow-Installer.dmg" download>Download DMG</a></li>
+        </ul>
+      </div>
+
+      <div data-component="content">
+        <section class="page-header">
+          <nav class="breadcrumb" aria-label="Breadcrumb">
+            <a href="/">Home</a> <span class="sep">/</span> <a href="/docs">Docs</a> <span class="sep">/</span> <span class="current">Troubleshooting</span>
+          </nav>
+          <h1>Troubleshooting Guide</h1>
+          <p class="subtitle">Diagnostic steps and solutions for common audio, permission, window, and speech synchronization issues.</p>
+        </section>
+
+        <section class="content-section">
+          <div class="prose">
+            <h2>Issue 1: Teleprompter Not Following Voice</h2>
+            <p><strong>Symptom:</strong> You begin speaking, but the highlighted word does not advance.</p>
+            <ol>
+              <li>
+                <strong>Verify Microphone Permissions:</strong> Open <strong>System Settings &gt; Privacy &amp; Security &gt; Microphone</strong>. Confirm that the toggle switch next to <strong>NotchFlow</strong> is enabled.
+              </li>
+              <li>
+                <strong>Check Active Input Device:</strong> Open <strong>System Settings &gt; Sound &gt; Input</strong>. Verify that your desired microphone is selected and that the Input Level meter moves when you speak.
+              </li>
+              <li>
+                <strong>Inspect Background Noise:</strong> High ambient noise (such as loud fans or music) can lower speech recognition confidence. Move closer to your microphone or use a headset mic.
+              </li>
+              <li>
+                <strong>Check Debug HUD:</strong> Press <span class="shortcut-key">D</span> while presenting to display the real-time recognition confidence score and buffer window.
+              </li>
+            </ol>
+
+            <h2>Issue 2: Notch Alignment Off-Center on External Monitor</h2>
+            <p><strong>Symptom:</strong> The prompter pod appears displaced when using an external display.</p>
+            <ul>
+              <li>
+                NotchFlow queries the display where the cursor currently resides. Move your mouse to the external display before clicking <strong>Start Teleprompter</strong>.
+              </li>
+              <li>
+                On notchless external screens, NotchFlow anchors to the top center. You can freely drag the window to reposition it anywhere along your display bezel.
+              </li>
+            </ul>
+
+            <h2>Issue 3: &ldquo;App is damaged and can't be opened&rdquo; Alert</h2>
+            <p><strong>Symptom:</strong> macOS Gatekeeper blocks opening newly downloaded DMG builds.</p>
+            <p>
+              This occurs when quarantine attributes are applied by the browser to open-source software without an expensive commercial developer certificate. To clear the quarantine attribute:
+            </p>
+            <pre><code>xattr -cr /Applications/NotchFlow.app</code></pre>
+            <p>
+              Then open NotchFlow normally from your Applications folder.
+            </p>
+
+            <h2>Issue 4: Resetting App Preferences</h2>
+            <p>
+              If you ever wish to restore NotchFlow to its factory default window sizes, themes, and settings:
+            </p>
+            <pre><code>defaults delete com.adityagupta.notchflow</code></pre>
+
+            <h2>Still Need Assistance?</h2>
+            <p>
+              If your issue persists, please submit an issue on our <a href="https://github.com/Nightkilller/NotchFlow/issues" target="_blank" rel="noopener">GitHub Issues tracker</a> or email us at <a href="mailto:gutaadi@gmail.com">gutaadi@gmail.com</a> with your macOS version and Mac model.
+            </p>
+          </div>
+        </section>
+      </div>
+
+      <!-- Footer -->
+      <footer data-component="footer">
+        <div data-slot="cell"><a href="/features">Features</a></div>
+        <div data-slot="cell"><a href="/docs">Docs</a></div>
+        <div data-slot="cell"><a href="/blog">Blog</a></div>
+        <div data-slot="cell"><a href="/faq">FAQ</a></div>
+        <div data-slot="cell"><a href="/about">About</a></div>
+      </footer>
+
+      <!-- Legal & Copyright Bar -->
+      <div data-component="legal">
+        <span>&copy; 2026 NotchFlow</span>
+        <a href="/privacy-policy">Privacy Policy</a>
+        <a href="/terms">Terms</a>
+        <a href="/contact">Contact</a>
+        <a href="https://github.com/Nightkilller/NotchFlow" target="_blank" rel="noopener">GitHub</a>
+      </div>
+
+      <!-- Subtle Patent-Style Watermark -->
+      <div class="patent-watermark">
+        <span>Created by Aditya Gupta with 🧠</span>
+      </div>
+    </div>
+
+    <script>
+      const t = document.getElementById('mobileMenuToggle');
+      const m = document.getElementById('mobileMenu');
+      if (t && m) {
+        t.addEventListener('click', () => m.classList.toggle('active'));
+        m.querySelectorAll('a').forEach(a => a.addEventListener('click', () => m.classList.remove('active')));
+      }
+    </script>
+  </body>
+</html>

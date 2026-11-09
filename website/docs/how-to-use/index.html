@@ -1,0 +1,215 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>How to Use & Hotkeys — NotchFlow</title>
+    <meta name="description" content="Learn how to operate NotchFlow: full keyboard shortcuts table, window resizing, theme switching, document imports, and mirror mode." />
+    <meta property="og:title" content="How to Use & Hotkeys — NotchFlow" />
+    <meta property="og:description" content="Learn how to operate NotchFlow: full keyboard shortcuts table, window resizing, theme switching, document imports, and mirror mode." />
+    <meta property="og:image" content="https://notchflow.vercel.app/assets/banner.png" />
+    <meta property="og:url" content="https://notchflow.vercel.app/docs/how-to-use/" />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="How to Use & Hotkeys — NotchFlow" />
+    <meta name="twitter:description" content="Learn how to operate NotchFlow: full keyboard shortcuts table, window resizing, theme switching, document imports, and mirror mode." />
+    <meta name="twitter:image" content="https://notchflow.vercel.app/assets/banner.png" />
+    <link rel="canonical" href="https://notchflow.vercel.app/docs/how-to-use/" />
+    <link rel="icon" type="image/png" href="/assets/logo.png" />
+    <link rel="stylesheet" href="/styles.css" />
+    <link rel="stylesheet" href="/page.css" />
+    <!-- Google AdSense -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4982175209260588"
+         crossorigin="anonymous"></script>
+
+  </head>
+  <body>
+    <div data-component="container">
+      <!-- Navigation -->
+      <section data-component="top">
+        <a href="/" class="brand-link">
+          <img src="/assets/logo.png" alt="NotchFlow" class="brand-logo-img" />
+          <span class="brand-name">NotchFlow</span>
+        </a>
+        <nav data-component="nav-desktop">
+          <ul>
+            <li><a href="/features">Features</a></li>
+            <li><a href="/docs">Docs</a></li>
+            <li><a href="/blog">Blog</a></li>
+            <li><a href="/faq">FAQ</a></li>
+            <li><a href="/about">About</a></li>
+            <li>
+              <a href="/downloads/NotchFlow-Installer.dmg" class="btn" data-slot="cta-button" download>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                  <polyline points="7 10 12 15 17 10"></polyline>
+                  <line x1="12" y1="15" x2="12" y2="3"></line>
+                </svg>
+                <span>Download DMG</span>
+              </a>
+            </li>
+          </ul>
+        </nav>
+        <button type="button" data-component="nav-mobile-toggle" id="mobileMenuToggle" aria-label="Toggle navigation">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="3" y1="12" x2="21" y2="12"></line>
+            <line x1="3" y1="6" x2="21" y2="6"></line>
+            <line x1="3" y1="18" x2="21" y2="18"></line>
+          </svg>
+        </button>
+      </section>
+
+      <!-- Mobile Dropdown Menu -->
+      <div data-component="nav-mobile-menu" id="mobileMenu">
+        <ul>
+          <li><a href="/">Home</a></li>
+          <li><a href="/features">Features</a></li>
+          <li><a href="/docs">Docs</a></li>
+          <li><a href="/blog">Blog</a></li>
+          <li><a href="/faq">FAQ</a></li>
+          <li><a href="/about">About</a></li>
+          <li><a href="/contact">Contact</a></li>
+          <li><a href="https://github.com/Nightkilller/NotchFlow" target="_blank" rel="noopener">GitHub</a></li>
+          <li><a href="/downloads/NotchFlow-Installer.dmg" download>Download DMG</a></li>
+        </ul>
+      </div>
+
+      <div data-component="content">
+        <section class="page-header">
+          <nav class="breadcrumb" aria-label="Breadcrumb">
+            <a href="/">Home</a> <span class="sep">/</span> <a href="/docs">Docs</a> <span class="sep">/</span> <span class="current">How to Use</span>
+          </nav>
+          <h1>How to Use NotchFlow</h1>
+          <p class="subtitle">Complete user manual covering script editing, speech controls, window resizing, keyboard hotkeys, and theme toggling.</p>
+        </section>
+
+        <section class="content-section">
+          <div class="prose">
+            <h2>The Presentation Interface</h2>
+            <p>
+              NotchFlow is split into two primary operational modes:
+            </p>
+            <ul>
+              <li><strong>Editor Window:</strong> A focused writing and script preparation environment where you compose, paste, or import documents.</li>
+              <li><strong>Notch Pod Window:</strong> The floating, notch-aligned presentation bar that tracks your voice and displays your active script while presenting.</li>
+            </ul>
+
+            <h2>Keyboard Shortcuts Reference</h2>
+            <p>
+              While presenting, you can control NotchFlow hands-free with your voice or using standard keyboard shortcuts:
+            </p>
+            <table>
+              <thead>
+                <tr>
+                  <th>Shortcut</th>
+                  <th>Function</th>
+                  <th>Description</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><span class="shortcut-key">Space</span></td>
+                  <td>Play / Pause</td>
+                  <td>Toggle speech tracking and manual scrolling.</td>
+                </tr>
+                <tr>
+                  <td><span class="shortcut-key">&larr;</span> / <span class="shortcut-key">&rarr;</span></td>
+                  <td>Step Word</td>
+                  <td>Move highlight backward or forward by one word.</td>
+                </tr>
+                <tr>
+                  <td><span class="shortcut-key">&uarr;</span> / <span class="shortcut-key">&darr;</span></td>
+                  <td>Jump Sentence</td>
+                  <td>Jump backward or forward by one complete sentence.</td>
+                </tr>
+                <tr>
+                  <td><span class="shortcut-key">R</span></td>
+                  <td>Reset</td>
+                  <td>Rewind script back to the very beginning.</td>
+                </tr>
+                <tr>
+                  <td><span class="shortcut-key">+</span> / <span class="shortcut-key">-</span></td>
+                  <td>Speed Adjustment</td>
+                  <td>Increase or decrease auto-scroll speed factor.</td>
+                </tr>
+                <tr>
+                  <td><span class="shortcut-key">[</span> / <span class="shortcut-key">]</span></td>
+                  <td>Font Size</td>
+                  <td>Increase or decrease reading typography size.</td>
+                </tr>
+                <tr>
+                  <td><span class="shortcut-key">D</span></td>
+                  <td>Debug HUD</td>
+                  <td>Toggle confidence scores, speech buffer, and metrics HUD.</td>
+                </tr>
+                <tr>
+                  <td><span class="shortcut-key">Esc</span></td>
+                  <td>Dismiss</td>
+                  <td>Close the prompter pod and return to the main editor.</td>
+                </tr>
+              </tbody>
+            </table>
+
+            <h2>Resizing the Teleprompter</h2>
+            <p>
+              Hover your pointer over any border or corner of the NotchFlow prompter window. When the cursor changes to a resize indicator, click and drag:
+            </p>
+            <ul>
+              <li><strong>Horizontal Width:</strong> Range between 380 pt and 950 pt.</li>
+              <li><strong>Vertical Height:</strong> Range between 180 pt and 650 pt.</li>
+            </ul>
+            <p>
+              NotchFlow automatically saves your dimension preferences and restores them the next time you launch a teleprompting session.
+            </p>
+
+            <h2>Switching Themes</h2>
+            <p>
+              In the prompter controls or main editor, click the theme button to switch between:
+            </p>
+            <ul>
+              <li><strong>Pure Black (<code>#000000</code>):</strong> Deep contrast theme designed for dimly lit rooms and subtle camera camouflage.</li>
+              <li><strong>Studio White (<code>#FFFFFF</code>):</strong> Clean daylight theme designed for high-ambient office and studio lighting.</li>
+            </ul>
+
+            <h2>Mirror Mode</h2>
+            <p>
+              If you mount your MacBook underneath a professional 70/30 teleprompter glass beam-splitter rig, enable <strong>Mirror Mode</strong> from the settings menu. This flips the script horizontally so it reads normally when reflected through optical glass.
+            </p>
+          </div>
+        </section>
+      </div>
+
+      <!-- Footer -->
+      <footer data-component="footer">
+        <div data-slot="cell"><a href="/features">Features</a></div>
+        <div data-slot="cell"><a href="/docs">Docs</a></div>
+        <div data-slot="cell"><a href="/blog">Blog</a></div>
+        <div data-slot="cell"><a href="/faq">FAQ</a></div>
+        <div data-slot="cell"><a href="/about">About</a></div>
+      </footer>
+
+      <!-- Legal & Copyright Bar -->
+      <div data-component="legal">
+        <span>&copy; 2026 NotchFlow</span>
+        <a href="/privacy-policy">Privacy Policy</a>
+        <a href="/terms">Terms</a>
+        <a href="/contact">Contact</a>
+        <a href="https://github.com/Nightkilller/NotchFlow" target="_blank" rel="noopener">GitHub</a>
+      </div>
+
+      <!-- Subtle Patent-Style Watermark -->
+      <div class="patent-watermark">
+        <span>Created by Aditya Gupta with 🧠</span>
+      </div>
+    </div>
+
+    <script>
+      const t = document.getElementById('mobileMenuToggle');
+      const m = document.getElementById('mobileMenu');
+      if (t && m) {
+        t.addEventListener('click', () => m.classList.toggle('active'));
+        m.querySelectorAll('a').forEach(a => a.addEventListener('click', () => m.classList.remove('active')));
+      }
+    </script>
+  </body>
+</html>

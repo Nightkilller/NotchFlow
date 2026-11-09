@@ -1,0 +1,221 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>How to Install NotchFlow on macOS — NotchFlow</title>
+    <meta name="description" content="A step-by-step walkthrough covering DMG drag-and-drop installation, Homebrew commands, source compilation, and initial security permissions." />
+    <meta property="og:title" content="How to Install NotchFlow on macOS — NotchFlow" />
+    <meta property="og:description" content="A step-by-step walkthrough covering DMG drag-and-drop installation, Homebrew commands, source compilation, and initial security permissions." />
+    <meta property="og:image" content="https://notchflow.vercel.app/assets/banner.png" />
+    <meta property="og:url" content="https://notchflow.vercel.app/blog/how-to-install-notchflow-on-macos/" />
+    <meta property="og:type" content="article" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="How to Install NotchFlow on macOS — NotchFlow" />
+    <meta name="twitter:description" content="A step-by-step walkthrough covering DMG drag-and-drop installation, Homebrew commands, source compilation, and initial security permissions." />
+    <meta name="twitter:image" content="https://notchflow.vercel.app/assets/banner.png" />
+    <link rel="canonical" href="https://notchflow.vercel.app/blog/how-to-install-notchflow-on-macos/" />
+    <link rel="icon" type="image/png" href="/assets/logo.png" />
+    <link rel="stylesheet" href="/styles.css" />
+    <link rel="stylesheet" href="/page.css" />
+    <!-- Google AdSense -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4982175209260588"
+         crossorigin="anonymous"></script>
+    <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "TechArticle",
+  "headline": "How to Install NotchFlow on macOS",
+  "description": "A step-by-step walkthrough covering DMG drag-and-drop installation, Homebrew commands, source compilation, and initial security permissions.",
+  "author": {
+    "@type": "Person",
+    "name": "Aditya Gupta"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "NotchFlow",
+    "url": "https://notchflow.vercel.app/"
+  },
+  "datePublished": "2026-11-03",
+  "dateModified": "2026-11-03",
+  "mainEntityOfPage": "https://notchflow.vercel.app/blog/how-to-install-notchflow-on-macos/"
+}
+    </script>
+  </head>
+  <body>
+    <div data-component="container">
+      <!-- Navigation -->
+      <section data-component="top">
+        <a href="/" class="brand-link">
+          <img src="/assets/logo.png" alt="NotchFlow" class="brand-logo-img" />
+          <span class="brand-name">NotchFlow</span>
+        </a>
+        <nav data-component="nav-desktop">
+          <ul>
+            <li><a href="/features">Features</a></li>
+            <li><a href="/docs">Docs</a></li>
+            <li><a href="/blog">Blog</a></li>
+            <li><a href="/faq">FAQ</a></li>
+            <li><a href="/about">About</a></li>
+            <li>
+              <a href="/downloads/NotchFlow-Installer.dmg" class="btn" data-slot="cta-button" download>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                  <polyline points="7 10 12 15 17 10"></polyline>
+                  <line x1="12" y1="15" x2="12" y2="3"></line>
+                </svg>
+                <span>Download DMG</span>
+              </a>
+            </li>
+          </ul>
+        </nav>
+        <button type="button" data-component="nav-mobile-toggle" id="mobileMenuToggle" aria-label="Toggle navigation">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="3" y1="12" x2="21" y2="12"></line>
+            <line x1="3" y1="6" x2="21" y2="6"></line>
+            <line x1="3" y1="18" x2="21" y2="18"></line>
+          </svg>
+        </button>
+      </section>
+
+      <!-- Mobile Dropdown Menu -->
+      <div data-component="nav-mobile-menu" id="mobileMenu">
+        <ul>
+          <li><a href="/">Home</a></li>
+          <li><a href="/features">Features</a></li>
+          <li><a href="/docs">Docs</a></li>
+          <li><a href="/blog">Blog</a></li>
+          <li><a href="/faq">FAQ</a></li>
+          <li><a href="/about">About</a></li>
+          <li><a href="/contact">Contact</a></li>
+          <li><a href="https://github.com/Nightkilller/NotchFlow" target="_blank" rel="noopener">GitHub</a></li>
+          <li><a href="/downloads/NotchFlow-Installer.dmg" download>Download DMG</a></li>
+        </ul>
+      </div>
+
+      <div data-component="content">
+        <section class="page-header">
+          <nav class="breadcrumb" aria-label="Breadcrumb">
+            <a href="/">Home</a> <span class="sep">/</span> <a href="/blog">Blog</a> <span class="sep">/</span> <span class="current">Install Guide</span>
+          </nav>
+          <h1>How to Install NotchFlow on macOS</h1>
+          <div class="article-meta">
+            <span>By Aditya Gupta</span> &bull;
+            <span>Published on November 3, 2026</span> &bull;
+            <span class="tag">Tutorial</span> &bull;
+            <span>5 min read</span>
+          </div>
+        </section>
+
+        <section class="content-section">
+          <div class="prose">
+            <p>
+              Installing software on modern macOS versions involves navigating Apple's Gatekeeper security verification, architecture checks, and privacy permissions. In this comprehensive tutorial, we cover three reliable methods to install NotchFlow on your Apple Silicon Mac.
+            </p>
+
+            <h2>Prerequisites</h2>
+            <p>
+              Before installing, confirm that your system meets the minimum requirements:
+            </p>
+            <ul>
+              <li><strong>Mac Model:</strong> Any Apple Silicon Mac (M1, M2, M3, M4 or variant chips).</li>
+              <li><strong>Operating System:</strong> macOS 14.0 Sonoma, macOS 15.0 Sequoia, or later.</li>
+              <li><strong>Disk Space:</strong> At least 150 MB of available storage.</li>
+            </ul>
+
+            <h2>Method 1: Direct Disk Image (DMG) Installation</h2>
+            <p>
+              This is the official recommended method for most users:
+            </p>
+            <ol>
+              <li>Download the official installer: <code>NotchFlow-Installer.dmg</code> from our <a href="/">homepage</a> or <a href="https://github.com/Nightkilller/NotchFlow/releases" target="_blank" rel="noopener">GitHub Releases</a>.</li>
+              <li>Locate the file in your <code>~/Downloads</code> folder and double-click to mount it.</li>
+              <li>In the Finder window that appears, drag the <strong>NotchFlow</strong> icon onto the <strong>Applications</strong> folder shortcut.</li>
+              <li>Wait for the copy process to complete, then right-click the mounted disk image on your desktop or sidebar and click <strong>Eject</strong>.</li>
+            </ol>
+
+            <h2>Method 2: Command Line Installation via Homebrew</h2>
+            <p>
+              If you maintain your Mac developer environment with the Homebrew package manager, you can install NotchFlow in a single terminal command:
+            </p>
+            <pre><code>brew install --cask notchflow</code></pre>
+            <p>
+              Homebrew automatically downloads the latest release, verifies checksums, and places the application in <code>/Applications</code>. To update NotchFlow in the future:
+            </p>
+            <pre><code>brew upgrade --cask notchflow</code></pre>
+
+            <h2>Method 3: Building from Source</h2>
+            <p>
+              For developers who prefer reviewing the Swift source code or compiling customized builds:
+            </p>
+            <pre><code># Step 1: Clone the repository
+git clone https://github.com/Nightkilller/NotchFlow.git
+cd NotchFlow
+
+# Step 2: Build the release binary with SwiftPM
+./build.sh release
+
+# Step 3: Package into macOS .app bundle
+./build.sh package
+
+# The finished bundle will be located at:
+# dist/NotchFlow.app</code></pre>
+
+            <h2>Configuring Initial macOS Permissions</h2>
+            <p>
+              When launching NotchFlow for the first time:
+            </p>
+            <ol>
+              <li>
+                <strong>Gatekeeper Prompt:</strong> Click <strong>Open</strong> when macOS asks to verify the newly downloaded application.
+              </li>
+              <li>
+                <strong>Microphone Access:</strong> Click <strong>OK</strong> when prompted for microphone access. NotchFlow uses this exclusively for on-device speech tracking.
+              </li>
+            </ol>
+            <p>
+              If you ever accidentally deny microphone permissions, you can re-enable them in <strong>System Settings &gt; Privacy &amp; Security &gt; Microphone</strong> by toggling the switch next to NotchFlow.
+            </p>
+
+            <h2>Verifying the Installation</h2>
+            <p>
+              Launch NotchFlow from Spotlight (<code>Cmd + Space</code> &gt; NotchFlow). Paste a short test sentence, click <strong>Start Teleprompter</strong>, and speak aloud. You should see the orange word highlight track your speech in real time.
+            </p>
+          </div>
+        </section>
+      </div>
+
+      <!-- Footer -->
+      <footer data-component="footer">
+        <div data-slot="cell"><a href="/features">Features</a></div>
+        <div data-slot="cell"><a href="/docs">Docs</a></div>
+        <div data-slot="cell"><a href="/blog">Blog</a></div>
+        <div data-slot="cell"><a href="/faq">FAQ</a></div>
+        <div data-slot="cell"><a href="/about">About</a></div>
+      </footer>
+
+      <!-- Legal & Copyright Bar -->
+      <div data-component="legal">
+        <span>&copy; 2026 NotchFlow</span>
+        <a href="/privacy-policy">Privacy Policy</a>
+        <a href="/terms">Terms</a>
+        <a href="/contact">Contact</a>
+        <a href="https://github.com/Nightkilller/NotchFlow" target="_blank" rel="noopener">GitHub</a>
+      </div>
+
+      <!-- Subtle Patent-Style Watermark -->
+      <div class="patent-watermark">
+        <span>Created by Aditya Gupta with 🧠</span>
+      </div>
+    </div>
+
+    <script>
+      const t = document.getElementById('mobileMenuToggle');
+      const m = document.getElementById('mobileMenu');
+      if (t && m) {
+        t.addEventListener('click', () => m.classList.toggle('active'));
+        m.querySelectorAll('a').forEach(a => a.addEventListener('click', () => m.classList.remove('active')));
+      }
+    </script>
+  </body>
+</html>

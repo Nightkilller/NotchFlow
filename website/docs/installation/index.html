@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Installation Guide — NotchFlow</title>
+    <meta name="description" content="How to install NotchFlow on macOS using the official DMG installer, Homebrew cask, or building directly from source." />
+    <meta property="og:title" content="Installation Guide — NotchFlow" />
+    <meta property="og:description" content="How to install NotchFlow on macOS using the official DMG installer, Homebrew cask, or building directly from source." />
+    <meta property="og:image" content="https://notchflow.vercel.app/assets/banner.png" />
+    <meta property="og:url" content="https://notchflow.vercel.app/docs/installation/" />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Installation Guide — NotchFlow" />
+    <meta name="twitter:description" content="How to install NotchFlow on macOS using the official DMG installer, Homebrew cask, or building directly from source." />
+    <meta name="twitter:image" content="https://notchflow.vercel.app/assets/banner.png" />
+    <link rel="canonical" href="https://notchflow.vercel.app/docs/installation/" />
+    <link rel="icon" type="image/png" href="/assets/logo.png" />
+    <link rel="stylesheet" href="/styles.css" />
+    <link rel="stylesheet" href="/page.css" />
+    <!-- Google AdSense -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4982175209260588"
+         crossorigin="anonymous"></script>
+
+  </head>
+  <body>
+    <div data-component="container">
+      <!-- Navigation -->
+      <section data-component="top">
+        <a href="/" class="brand-link">
+          <img src="/assets/logo.png" alt="NotchFlow" class="brand-logo-img" />
+          <span class="brand-name">NotchFlow</span>
+        </a>
+        <nav data-component="nav-desktop">
+          <ul>
+            <li><a href="/features">Features</a></li>
+            <li><a href="/docs">Docs</a></li>
+            <li><a href="/blog">Blog</a></li>
+            <li><a href="/faq">FAQ</a></li>
+            <li><a href="/about">About</a></li>
+            <li>
+              <a href="/downloads/NotchFlow-Installer.dmg" class="btn" data-slot="cta-button" download>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                  <polyline points="7 10 12 15 17 10"></polyline>
+                  <line x1="12" y1="15" x2="12" y2="3"></line>
+                </svg>
+                <span>Download DMG</span>
+              </a>
+            </li>
+          </ul>
+        </nav>
+        <button type="button" data-component="nav-mobile-toggle" id="mobileMenuToggle" aria-label="Toggle navigation">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="3" y1="12" x2="21" y2="12"></line>
+            <line x1="3" y1="6" x2="21" y2="6"></line>
+            <line x1="3" y1="18" x2="21" y2="18"></line>
+          </svg>
+        </button>
+      </section>
+
+      <!-- Mobile Dropdown Menu -->
+      <div data-component="nav-mobile-menu" id="mobileMenu">
+        <ul>
+          <li><a href="/">Home</a></li>
+          <li><a href="/features">Features</a></li>
+          <li><a href="/docs">Docs</a></li>
+          <li><a href="/blog">Blog</a></li>
+          <li><a href="/faq">FAQ</a></li>
+          <li><a href="/about">About</a></li>
+          <li><a href="/contact">Contact</a></li>
+          <li><a href="https://github.com/Nightkilller/NotchFlow" target="_blank" rel="noopener">GitHub</a></li>
+          <li><a href="/downloads/NotchFlow-Installer.dmg" download>Download DMG</a></li>
+        </ul>
+      </div>
+
+      <div data-component="content">
+        <section class="page-header">
+          <nav class="breadcrumb" aria-label="Breadcrumb">
+            <a href="/">Home</a> <span class="sep">/</span> <a href="/docs">Docs</a> <span class="sep">/</span> <span class="current">Installation</span>
+          </nav>
+          <h1>Installation Guide</h1>
+          <p class="subtitle">Multiple ways to install and update NotchFlow on macOS.</p>
+        </section>
+
+        <section class="content-section">
+          <div class="prose">
+            <h2>Method 1: Direct DMG Download (Recommended)</h2>
+            <p>
+              The simplest and fastest method is to download the pre-compiled universal disk image:
+            </p>
+            <ol>
+              <li>Download <code>NotchFlow-Installer.dmg</code> from our <a href="/">homepage</a> or the official <a href="https://github.com/Nightkilller/NotchFlow/releases" target="_blank" rel="noopener">GitHub Releases</a> page.</li>
+              <li>Double-click the downloaded <code>.dmg</code> file to mount the disk image.</li>
+              <li>Drag <strong>NotchFlow.app</strong> into the <strong>Applications</strong> shortcut folder.</li>
+              <li>Eject the disk image from Finder.</li>
+              <li>Open NotchFlow from Launchpad or Spotlight (<code>Cmd + Space</code> &gt; NotchFlow).</li>
+            </ol>
+
+            <h2>Method 2: Homebrew Cask</h2>
+            <p>
+              For users who prefer managing software with Homebrew, you can install NotchFlow via terminal:
+            </p>
+            <pre><code>brew install --cask notchflow</code></pre>
+            <p>
+              To update NotchFlow in the future via Homebrew:
+            </p>
+            <pre><code>brew upgrade --cask notchflow</code></pre>
+
+            <h2>Method 3: Build from Source</h2>
+            <p>
+              If you want to contribute or inspect the codebase before running, you can compile NotchFlow directly from source using the Swift package manager:
+            </p>
+            <pre><code># 1. Clone the repository
+git clone https://github.com/Nightkilller/NotchFlow.git
+cd NotchFlow
+
+# 2. Build release binary
+./build.sh release
+
+# 3. Package application bundle into dist/
+./build.sh package
+
+# 4. (Optional) Generate the drag-and-drop DMG installer
+./build.sh dmg</code></pre>
+            <p>
+              The compiled application bundle will be generated in <code>dist/NotchFlow.app</code>.
+            </p>
+
+            <h2>macOS Gatekeeper Verification</h2>
+            <p>
+              Because NotchFlow is open-source software, macOS Gatekeeper may present an initial prompt asking if you wish to open the application downloaded from the internet. Click <strong>Open</strong>. If prompted with a security warning, open <strong>System Settings &gt; Privacy &amp; Security</strong>, scroll down to the Security section, and click <strong>Open Anyway</strong>.
+            </p>
+          </div>
+        </section>
+      </div>
+
+      <!-- Footer -->
+      <footer data-component="footer">
+        <div data-slot="cell"><a href="/features">Features</a></div>
+        <div data-slot="cell"><a href="/docs">Docs</a></div>
+        <div data-slot="cell"><a href="/blog">Blog</a></div>
+        <div data-slot="cell"><a href="/faq">FAQ</a></div>
+        <div data-slot="cell"><a href="/about">About</a></div>
+      </footer>
+
+      <!-- Legal & Copyright Bar -->
+      <div data-component="legal">
+        <span>&copy; 2026 NotchFlow</span>
+        <a href="/privacy-policy">Privacy Policy</a>
+        <a href="/terms">Terms</a>
+        <a href="/contact">Contact</a>
+        <a href="https://github.com/Nightkilller/NotchFlow" target="_blank" rel="noopener">GitHub</a>
+      </div>
+
+      <!-- Subtle Patent-Style Watermark -->
+      <div class="patent-watermark">
+        <span>Created by Aditya Gupta with 🧠</span>
+      </div>
+    </div>
+
+    <script>
+      const t = document.getElementById('mobileMenuToggle');
+      const m = document.getElementById('mobileMenu');
+      if (t && m) {
+        t.addEventListener('click', () => m.classList.toggle('active'));
+        m.querySelectorAll('a').forEach(a => a.addEventListener('click', () => m.classList.remove('active')));
+      }
+    </script>
+  </body>
+</html>

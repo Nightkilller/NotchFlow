@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>System Requirements — NotchFlow</title>
+    <meta name="description" content="Check macOS version compatibility, Apple Silicon M1-M4 processor requirements, and hardware specifications for NotchFlow." />
+    <meta property="og:title" content="System Requirements — NotchFlow" />
+    <meta property="og:description" content="Check macOS version compatibility, Apple Silicon M1-M4 processor requirements, and hardware specifications for NotchFlow." />
+    <meta property="og:image" content="https://notchflow.vercel.app/assets/banner.png" />
+    <meta property="og:url" content="https://notchflow.vercel.app/docs/requirements/" />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="System Requirements — NotchFlow" />
+    <meta name="twitter:description" content="Check macOS version compatibility, Apple Silicon M1-M4 processor requirements, and hardware specifications for NotchFlow." />
+    <meta name="twitter:image" content="https://notchflow.vercel.app/assets/banner.png" />
+    <link rel="canonical" href="https://notchflow.vercel.app/docs/requirements/" />
+    <link rel="icon" type="image/png" href="/assets/logo.png" />
+    <link rel="stylesheet" href="/styles.css" />
+    <link rel="stylesheet" href="/page.css" />
+    <!-- Google AdSense -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4982175209260588"
+         crossorigin="anonymous"></script>
+
+  </head>
+  <body>
+    <div data-component="container">
+      <!-- Navigation -->
+      <section data-component="top">
+        <a href="/" class="brand-link">
+          <img src="/assets/logo.png" alt="NotchFlow" class="brand-logo-img" />
+          <span class="brand-name">NotchFlow</span>
+        </a>
+        <nav data-component="nav-desktop">
+          <ul>
+            <li><a href="/features">Features</a></li>
+            <li><a href="/docs">Docs</a></li>
+            <li><a href="/blog">Blog</a></li>
+            <li><a href="/faq">FAQ</a></li>
+            <li><a href="/about">About</a></li>
+            <li>
+              <a href="/downloads/NotchFlow-Installer.dmg" class="btn" data-slot="cta-button" download>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                  <polyline points="7 10 12 15 17 10"></polyline>
+                  <line x1="12" y1="15" x2="12" y2="3"></line>
+                </svg>
+                <span>Download DMG</span>
+              </a>
+            </li>
+          </ul>
+        </nav>
+        <button type="button" data-component="nav-mobile-toggle" id="mobileMenuToggle" aria-label="Toggle navigation">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="3" y1="12" x2="21" y2="12"></line>
+            <line x1="3" y1="6" x2="21" y2="6"></line>
+            <line x1="3" y1="18" x2="21" y2="18"></line>
+          </svg>
+        </button>
+      </section>
+
+      <!-- Mobile Dropdown Menu -->
+      <div data-component="nav-mobile-menu" id="mobileMenu">
+        <ul>
+          <li><a href="/">Home</a></li>
+          <li><a href="/features">Features</a></li>
+          <li><a href="/docs">Docs</a></li>
+          <li><a href="/blog">Blog</a></li>
+          <li><a href="/faq">FAQ</a></li>
+          <li><a href="/about">About</a></li>
+          <li><a href="/contact">Contact</a></li>
+          <li><a href="https://github.com/Nightkilller/NotchFlow" target="_blank" rel="noopener">GitHub</a></li>
+          <li><a href="/downloads/NotchFlow-Installer.dmg" download>Download DMG</a></li>
+        </ul>
+      </div>
+
+      <div data-component="content">
+        <section class="page-header">
+          <nav class="breadcrumb" aria-label="Breadcrumb">
+            <a href="/">Home</a> <span class="sep">/</span> <a href="/docs">Docs</a> <span class="sep">/</span> <span class="current">Requirements</span>
+          </nav>
+          <h1>System Requirements</h1>
+          <p class="subtitle">Detailed hardware, operating system, and permission requirements for NotchFlow.</p>
+        </section>
+
+        <section class="content-section">
+          <div class="prose">
+            <h2>Hardware Requirements</h2>
+            <table>
+              <thead>
+                <tr>
+                  <th>Component</th>
+                  <th>Requirement</th>
+                  <th>Notes</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>Processor</strong></td>
+                  <td>Apple Silicon (M1, M2, M3, M4 or Pro/Max/Ultra variants)</td>
+                  <td>SpeechKit relies on Apple Neural Engine matrix coprocessors for sub-millisecond local speech evaluation. Intel Macs are not supported.</td>
+                </tr>
+                <tr>
+                  <td><strong>Memory (RAM)</strong></td>
+                  <td>8 GB unified memory or higher</td>
+                  <td>NotchFlow runs natively in Swift and typically consumes under 60 MB of RAM while active.</td>
+                </tr>
+                <tr>
+                  <td><strong>Storage</strong></td>
+                  <td>~150 MB free disk space</td>
+                  <td>Application bundle and local linguistic models.</td>
+                </tr>
+                <tr>
+                  <td><strong>Microphone</strong></td>
+                  <td>Built-in MacBook microphone or any external audio input</td>
+                  <td>Works with USB microphones, AirPods, and studio XLR interfaces.</td>
+                </tr>
+              </tbody>
+            </table>
+
+            <h2>Operating System Requirements</h2>
+            <ul>
+              <li><strong>macOS 14.0 Sonoma</strong> (Fully supported)</li>
+              <li><strong>macOS 15.0 Sequoia</strong> (Fully supported)</li>
+              <li>macOS 13.x Ventura and older versions are not supported due to Swift 6 concurrency and SwiftUI APIs introduced in Sonoma.</li>
+            </ul>
+
+            <h2>Display Hardware Compatibility</h2>
+            <ul>
+              <li><strong>MacBook Pro 14&Prime; &amp; 16&Prime; (2021&ndash;present):</strong> Automatic safe-area geometry alignment around the camera notch.</li>
+              <li><strong>MacBook Air 13&Prime; &amp; 15&Prime; (2022&ndash;present):</strong> Automatic notch alignment around the M2/M3 camera cutout.</li>
+              <li><strong>Notchless Macs &amp; External Displays:</strong> Automatic top-center floating alignment with continuous rounded corners on Studio Display, Pro Display XDR, iMac, Mac mini, Mac Studio, or third-party 4K/1440p monitors.</li>
+            </ul>
+
+            <h2>System Permissions (TCC)</h2>
+            <p>
+              Under Apple's Transparency, Consent, and Control (TCC) security framework, NotchFlow requires one explicit permission:
+            </p>
+            <ul>
+              <li><strong>Microphone Access (<code>NSMicrophoneUsageDescription</code>):</strong> Used exclusively to pace teleprompter scrolling to your live voice. No audio data leaves your device.</li>
+            </ul>
+          </div>
+        </section>
+      </div>
+
+      <!-- Footer -->
+      <footer data-component="footer">
+        <div data-slot="cell"><a href="/features">Features</a></div>
+        <div data-slot="cell"><a href="/docs">Docs</a></div>
+        <div data-slot="cell"><a href="/blog">Blog</a></div>
+        <div data-slot="cell"><a href="/faq">FAQ</a></div>
+        <div data-slot="cell"><a href="/about">About</a></div>
+      </footer>
+
+      <!-- Legal & Copyright Bar -->
+      <div data-component="legal">
+        <span>&copy; 2026 NotchFlow</span>
+        <a href="/privacy-policy">Privacy Policy</a>
+        <a href="/terms">Terms</a>
+        <a href="/contact">Contact</a>
+        <a href="https://github.com/Nightkilller/NotchFlow" target="_blank" rel="noopener">GitHub</a>
+      </div>
+
+      <!-- Subtle Patent-Style Watermark -->
+      <div class="patent-watermark">
+        <span>Created by Aditya Gupta with 🧠</span>
+      </div>
+    </div>
+
+    <script>
+      const t = document.getElementById('mobileMenuToggle');
+      const m = document.getElementById('mobileMenu');
+      if (t && m) {
+        t.addEventListener('click', () => m.classList.toggle('active'));
+        m.querySelectorAll('a').forEach(a => a.addEventListener('click', () => m.classList.remove('active')));
+      }
+    </script>
+  </body>
+</html>

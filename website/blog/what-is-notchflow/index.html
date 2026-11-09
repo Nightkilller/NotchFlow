@@ -1,0 +1,218 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>What Is NotchFlow and How Does It Work? — NotchFlow</title>
+    <meta name="description" content="An architectural deep-dive into how NotchFlow anchors a native teleprompter beneath the MacBook camera notch and tracks speech using Apple Neural Engine." />
+    <meta property="og:title" content="What Is NotchFlow and How Does It Work? — NotchFlow" />
+    <meta property="og:description" content="An architectural deep-dive into how NotchFlow anchors a native teleprompter beneath the MacBook camera notch and tracks speech using Apple Neural Engine." />
+    <meta property="og:image" content="https://notchflow.vercel.app/assets/banner.png" />
+    <meta property="og:url" content="https://notchflow.vercel.app/blog/what-is-notchflow/" />
+    <meta property="og:type" content="article" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="What Is NotchFlow and How Does It Work? — NotchFlow" />
+    <meta name="twitter:description" content="An architectural deep-dive into how NotchFlow anchors a native teleprompter beneath the MacBook camera notch and tracks speech using Apple Neural Engine." />
+    <meta name="twitter:image" content="https://notchflow.vercel.app/assets/banner.png" />
+    <link rel="canonical" href="https://notchflow.vercel.app/blog/what-is-notchflow/" />
+    <link rel="icon" type="image/png" href="/assets/logo.png" />
+    <link rel="stylesheet" href="/styles.css" />
+    <link rel="stylesheet" href="/page.css" />
+    <!-- Google AdSense -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4982175209260588"
+         crossorigin="anonymous"></script>
+    <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "TechArticle",
+  "headline": "What Is NotchFlow and How Does It Work?",
+  "description": "An architectural deep-dive into how NotchFlow anchors a native teleprompter beneath the MacBook camera notch and tracks speech using Apple Neural Engine.",
+  "author": {
+    "@type": "Person",
+    "name": "Aditya Gupta"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "NotchFlow",
+    "url": "https://notchflow.vercel.app/"
+  },
+  "datePublished": "2026-11-02",
+  "dateModified": "2026-11-02",
+  "mainEntityOfPage": "https://notchflow.vercel.app/blog/what-is-notchflow/"
+}
+    </script>
+  </head>
+  <body>
+    <div data-component="container">
+      <!-- Navigation -->
+      <section data-component="top">
+        <a href="/" class="brand-link">
+          <img src="/assets/logo.png" alt="NotchFlow" class="brand-logo-img" />
+          <span class="brand-name">NotchFlow</span>
+        </a>
+        <nav data-component="nav-desktop">
+          <ul>
+            <li><a href="/features">Features</a></li>
+            <li><a href="/docs">Docs</a></li>
+            <li><a href="/blog">Blog</a></li>
+            <li><a href="/faq">FAQ</a></li>
+            <li><a href="/about">About</a></li>
+            <li>
+              <a href="/downloads/NotchFlow-Installer.dmg" class="btn" data-slot="cta-button" download>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                  <polyline points="7 10 12 15 17 10"></polyline>
+                  <line x1="12" y1="15" x2="12" y2="3"></line>
+                </svg>
+                <span>Download DMG</span>
+              </a>
+            </li>
+          </ul>
+        </nav>
+        <button type="button" data-component="nav-mobile-toggle" id="mobileMenuToggle" aria-label="Toggle navigation">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="3" y1="12" x2="21" y2="12"></line>
+            <line x1="3" y1="6" x2="21" y2="6"></line>
+            <line x1="3" y1="18" x2="21" y2="18"></line>
+          </svg>
+        </button>
+      </section>
+
+      <!-- Mobile Dropdown Menu -->
+      <div data-component="nav-mobile-menu" id="mobileMenu">
+        <ul>
+          <li><a href="/">Home</a></li>
+          <li><a href="/features">Features</a></li>
+          <li><a href="/docs">Docs</a></li>
+          <li><a href="/blog">Blog</a></li>
+          <li><a href="/faq">FAQ</a></li>
+          <li><a href="/about">About</a></li>
+          <li><a href="/contact">Contact</a></li>
+          <li><a href="https://github.com/Nightkilller/NotchFlow" target="_blank" rel="noopener">GitHub</a></li>
+          <li><a href="/downloads/NotchFlow-Installer.dmg" download>Download DMG</a></li>
+        </ul>
+      </div>
+
+      <div data-component="content">
+        <section class="page-header">
+          <nav class="breadcrumb" aria-label="Breadcrumb">
+            <a href="/">Home</a> <span class="sep">/</span> <a href="/blog">Blog</a> <span class="sep">/</span> <span class="current">What Is NotchFlow</span>
+          </nav>
+          <h1>What Is NotchFlow and How Does It Work?</h1>
+          <div class="article-meta">
+            <span>By Aditya Gupta</span> &bull;
+            <span>Published on November 2, 2026</span> &bull;
+            <span class="tag">Architecture</span> &bull;
+            <span>6 min read</span>
+          </div>
+        </section>
+
+        <section class="content-section">
+          <div class="prose">
+            <p>
+              Delivering high-stakes presentations through a computer screen presents a fundamental physical challenge: eye contact. In physical conversations, humans gauge confidence, intent, and emotional nuance by looking directly into another person's eyes. In video conferencing or remote keynotes, looking at the other person's face on your screen means looking <em>away</em> from your webcam lens.
+            </p>
+            <p>
+              Teleprompters have historically solved this problem for television broadcasters using half-silvered beam-splitter glass positioned in front of expensive studio cameras. But for MacBook users working from home offices or remote desks, such hardware is cumbersome, expensive, and impractical.
+            </p>
+            <p>
+              <strong>NotchFlow</strong> was built to solve this exact problem entirely in software, natively on macOS. In this article, we examine the architecture, engineering decisions, and speech synchronization algorithms that power NotchFlow.
+            </p>
+
+            <h2>1. Display Notch Anchoring & Geometry</h2>
+            <p>
+              Starting with the 2021 M1 Pro and M1 Max MacBook Pro models, Apple introduced a camera notch cutout at the top center of the display. While initially controversial, the notch created an intriguing ergonomic opportunity: the camera lens sits precisely at the center of this black bezel intrusion.
+            </p>
+            <p>
+              NotchFlow queries the active screen's safe-area insets via AppKit:
+            </p>
+            <pre><code>guard let screen = NSScreen.main else { return }
+let insets = screen.safeAreaInsets
+let notchWidth: CGFloat = 210.0
+let notchHeight = insets.top // Matches physical hardware bezel</code></pre>
+            <p>
+              By aligning its reading pod directly beneath these insets and applying matching corner radiuses, NotchFlow places presentation scripts within mere millimeters of the camera sensor. When you read the active line of text, your gaze angle is virtually indistinguishable from looking directly into the lens.
+            </p>
+
+            <h2>2. Low-Latency Speech Synchronization Engine</h2>
+            <p>
+              Traditional computer teleprompters rely on constant-speed auto-scrolling (e.g. 130 words per minute). This forces the speaker into an unnatural, robotic rhythm. If you cough, stumble, or pause for dramatic effect, the script scrolls ahead without you.
+            </p>
+            <p>
+              NotchFlow takes an entirely different approach: <strong>voice-paced synchronization</strong>.
+            </p>
+            <p>
+              Using Apple's native <code>SFSpeechRecognizer</code> configured for on-device recognition (<code>requiresOnDeviceRecognition = true</code>), incoming audio from your microphone is evaluated locally in near real-time.
+            </p>
+
+            <h3>The Sliding Confirmation Window</h3>
+            <p>
+              Raw speech recognition results are rarely 100% identical to written script tokens due to homophones, dropped endings, and accents. NotchFlow normalizes both the pre-loaded script and live speech tokens through a three-stage pipeline:
+            </p>
+            <ol>
+              <li><strong>Punctuation & Case Stripping:</strong> Converts tokens to lowercase alphanumeric strings.</li>
+              <li><strong>Phonetic & Fuzzy Alignment:</strong> Compares phonetic candidates within a forward search window of 6 to 10 words.</li>
+              <li><strong>Confidence-Weighted Advance:</strong> When token similarity exceeds the threshold, the prompter marks words as completed and advances the orange focus highlight.</li>
+            </ol>
+
+            <h2>3. Idle Auto-Shrink: Ergonomic Window Management</h2>
+            <p>
+              Presenters often need to view presentation slides, video previews, or chat messages during a call. To prevent the teleprompter from obstructing other applications, NotchFlow tracks cursor proximity.
+            </p>
+            <p>
+              When your cursor moves away from the teleprompter window, the window smoothly animates down to a compact 2-line glance bar. Bringing your pointer back into the window area immediately expands the full controls and larger reading viewport.
+            </p>
+
+            <h2>4. On-Device Privacy: Zero Cloud Footprint</h2>
+            <p>
+              Executive presentations, legal depositions, and proprietary product launches often involve sensitive text that cannot be sent to third-party cloud transcription providers. Because NotchFlow leverages Apple Silicon Neural Engine cores, every audio sample and script token remains strictly in local memory.
+            </p>
+            <p>
+              NotchFlow requires no user accounts, establishes no outbound network connections, and operates flawlessly in airplane mode.
+            </p>
+
+            <h2>Summary</h2>
+            <p>
+              By combining native SwiftUI architecture, hardware-aligned notch geometry, and local machine learning models, NotchFlow turns your existing MacBook into a professional teleprompting workstation without additional hardware.
+            </p>
+            <p>
+              To try NotchFlow for yourself, download the installer from our <a href="/">homepage</a> or explore the full source code on <a href="https://github.com/Nightkilller/NotchFlow" target="_blank" rel="noopener">GitHub</a>.
+            </p>
+          </div>
+        </section>
+      </div>
+
+      <!-- Footer -->
+      <footer data-component="footer">
+        <div data-slot="cell"><a href="/features">Features</a></div>
+        <div data-slot="cell"><a href="/docs">Docs</a></div>
+        <div data-slot="cell"><a href="/blog">Blog</a></div>
+        <div data-slot="cell"><a href="/faq">FAQ</a></div>
+        <div data-slot="cell"><a href="/about">About</a></div>
+      </footer>
+
+      <!-- Legal & Copyright Bar -->
+      <div data-component="legal">
+        <span>&copy; 2026 NotchFlow</span>
+        <a href="/privacy-policy">Privacy Policy</a>
+        <a href="/terms">Terms</a>
+        <a href="/contact">Contact</a>
+        <a href="https://github.com/Nightkilller/NotchFlow" target="_blank" rel="noopener">GitHub</a>
+      </div>
+
+      <!-- Subtle Patent-Style Watermark -->
+      <div class="patent-watermark">
+        <span>Created by Aditya Gupta with 🧠</span>
+      </div>
+    </div>
+
+    <script>
+      const t = document.getElementById('mobileMenuToggle');
+      const m = document.getElementById('mobileMenu');
+      if (t && m) {
+        t.addEventListener('click', () => m.classList.toggle('active'));
+        m.querySelectorAll('a').forEach(a => a.addEventListener('click', () => m.classList.remove('active')));
+      }
+    </script>
+  </body>
+</html>

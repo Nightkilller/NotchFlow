@@ -1,0 +1,219 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Features & Capabilities — NotchFlow</title>
+    <meta name="description" content="Explore the complete verified feature set of NotchFlow: notch docking, on-device voice tracking, auto-shrink, and native SwiftUI macOS performance." />
+    <meta property="og:title" content="Features & Capabilities — NotchFlow" />
+    <meta property="og:description" content="Explore the complete verified feature set of NotchFlow: notch docking, on-device voice tracking, auto-shrink, and native SwiftUI macOS performance." />
+    <meta property="og:image" content="https://notchflow.vercel.app/assets/banner.png" />
+    <meta property="og:url" content="https://notchflow.vercel.app/features/" />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Features & Capabilities — NotchFlow" />
+    <meta name="twitter:description" content="Explore the complete verified feature set of NotchFlow: notch docking, on-device voice tracking, auto-shrink, and native SwiftUI macOS performance." />
+    <meta name="twitter:image" content="https://notchflow.vercel.app/assets/banner.png" />
+    <link rel="canonical" href="https://notchflow.vercel.app/features/" />
+    <link rel="icon" type="image/png" href="/assets/logo.png" />
+    <link rel="stylesheet" href="/styles.css" />
+    <link rel="stylesheet" href="/page.css" />
+    <!-- Google AdSense -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4982175209260588"
+         crossorigin="anonymous"></script>
+
+  </head>
+  <body>
+    <div data-component="container">
+      <!-- Navigation -->
+      <section data-component="top">
+        <a href="/" class="brand-link">
+          <img src="/assets/logo.png" alt="NotchFlow" class="brand-logo-img" />
+          <span class="brand-name">NotchFlow</span>
+        </a>
+        <nav data-component="nav-desktop">
+          <ul>
+            <li><a href="/features">Features</a></li>
+            <li><a href="/docs">Docs</a></li>
+            <li><a href="/blog">Blog</a></li>
+            <li><a href="/faq">FAQ</a></li>
+            <li><a href="/about">About</a></li>
+            <li>
+              <a href="/downloads/NotchFlow-Installer.dmg" class="btn" data-slot="cta-button" download>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                  <polyline points="7 10 12 15 17 10"></polyline>
+                  <line x1="12" y1="15" x2="12" y2="3"></line>
+                </svg>
+                <span>Download DMG</span>
+              </a>
+            </li>
+          </ul>
+        </nav>
+        <button type="button" data-component="nav-mobile-toggle" id="mobileMenuToggle" aria-label="Toggle navigation">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="3" y1="12" x2="21" y2="12"></line>
+            <line x1="3" y1="6" x2="21" y2="6"></line>
+            <line x1="3" y1="18" x2="21" y2="18"></line>
+          </svg>
+        </button>
+      </section>
+
+      <!-- Mobile Dropdown Menu -->
+      <div data-component="nav-mobile-menu" id="mobileMenu">
+        <ul>
+          <li><a href="/">Home</a></li>
+          <li><a href="/features">Features</a></li>
+          <li><a href="/docs">Docs</a></li>
+          <li><a href="/blog">Blog</a></li>
+          <li><a href="/faq">FAQ</a></li>
+          <li><a href="/about">About</a></li>
+          <li><a href="/contact">Contact</a></li>
+          <li><a href="https://github.com/Nightkilller/NotchFlow" target="_blank" rel="noopener">GitHub</a></li>
+          <li><a href="/downloads/NotchFlow-Installer.dmg" download>Download DMG</a></li>
+        </ul>
+      </div>
+
+      <div data-component="content">
+        <section class="page-header">
+          <nav class="breadcrumb" aria-label="Breadcrumb">
+            <a href="/">Home</a> <span class="sep">/</span> <span class="current">Features</span>
+          </nav>
+          <h1>Verified NotchFlow Features</h1>
+          <p class="subtitle">A technical overview of the presentation and speech-synchronization capabilities built into NotchFlow for Apple Silicon MacBooks.</p>
+        </section>
+
+        <section class="content-section">
+          <div class="prose">
+            <p>
+              NotchFlow is built specifically to address the disconnection between digital presentation scripts and human audience engagement. Rather than forcing speakers to glance away from the camera lens to read a second monitor, physical cue cards, or an awkward desktop window, NotchFlow operates directly at the physical bezel level of modern MacBook displays.
+            </p>
+          </div>
+        </section>
+
+        <section class="feature-block">
+          <h2>1. Display Notch Alignment & Geometry Snapping</h2>
+          <p>
+            NotchFlow queries the active display safe-area insets via macOS AppKit APIs (<code>NSScreen.safeAreaInsets</code>). On modern MacBook Pro and MacBook Air models featuring a camera cutout, NotchFlow anchors its reading pod seamlessly beneath the notch, utilizing continuous corner curvatures that mirror the hardware display radius.
+          </p>
+          <div class="use-cases">
+            <h4>Practical Applications</h4>
+            <ul>
+              <li><strong>Remote Keynotes & Webinars:</strong> Look directly into the audience without shifting your gaze downward.</li>
+              <li><strong>External Monitor Support:</strong> On notchless displays or secondary screens, NotchFlow intelligently centers itself along the top bezel with smooth pill rounding.</li>
+            </ul>
+          </div>
+        </section>
+
+        <section class="feature-block">
+          <h2>2. Low-Latency Voice-Paced Synchronization</h2>
+          <p>
+            Unlike mechanical teleprompters that roll at an arbitrary words-per-minute speed, NotchFlow tracks your actual speech cadence. Leveraging Apple's on-device Speech framework (<code>SFSpeechRecognizer</code>), it aligns recognized phonemes and words against your pre-loaded script using a fuzzy matching sliding window.
+          </p>
+          <div class="use-cases">
+            <h4>Practical Applications</h4>
+            <ul>
+              <li><strong>Ad-Libbing & Pauses:</strong> Drink water or answer a sudden question during a pitch; NotchFlow holds your place and resumes precisely when you speak the next sentence.</li>
+              <li><strong>Variable Cadence:</strong> Speed up through familiar introductions or slow down during complex financial figures without touching a remote control.</li>
+            </ul>
+          </div>
+        </section>
+
+        <section class="feature-block">
+          <h2>3. High-Contrast Focus Word Highlighting</h2>
+          <p>
+            To prevent visual disorientation when tracking rapid paragraphs, NotchFlow separates the script into three distinct typographical focus states:
+          </p>
+          <ul>
+            <li><strong>Completed Words:</strong> Softened opacity to diminish distractions from past text.</li>
+            <li><strong>Active Word:</strong> High-contrast signature orange pill accent that guides the eye forward.</li>
+            <li><strong>Upcoming Words:</strong> Clean high-contrast typography so you can anticipate sentence structures and inflection points.</li>
+          </ul>
+        </section>
+
+        <section class="feature-block">
+          <h2>4. Idle Auto-Shrink & Hover Expansion</h2>
+          <p>
+            Screen real estate is crucial during screen shares, live coding, and video calls. NotchFlow implements an intelligent pointer-tracking service. When your mouse leaves the prompter zone during a speech, NotchFlow smoothly animates into a streamlined, low-profile 2-line glance bar. Bringing your pointer near instantly restores full playback controls and script management.
+          </p>
+        </section>
+
+        <section class="feature-block">
+          <h2>5. Live Edge & Corner Resizing</h2>
+          <p>
+            Every speaker has different visual acuity and script preferences. NotchFlow supports direct live dragging across all window borders and corners. You can freely resize the reading canvas between <strong>380 pt and 950 pt</strong> in width, and <strong>180 pt to 650 pt</strong> in height. Dimension preferences are saved automatically across sessions.
+          </p>
+        </section>
+
+        <section class="feature-block">
+          <h2>6. Pure Dark & Studio Light Themes</h2>
+          <p>
+            With a single click or keyboard command, switch between a deep <code>#000000</code> OLED black theme (perfect for discreet nighttime presentations and dark studio setups) and a crisp Studio White theme tailored for high-ambient daylight office spaces.
+          </p>
+        </section>
+
+        <section class="feature-block">
+          <h2>7. Multi-Format Document Import & Sanitization</h2>
+          <p>
+            Import preparation materials directly from Plain Text (<code>.txt</code>), Markdown (<code>.md</code>), or PDF documents. NotchFlow automatically strips extraneous markdown formatting tokens, headers, page numbers, and awkward line breaks, generating a clean linear reading stream ready for presentation.
+          </p>
+        </section>
+
+        <section class="feature-block">
+          <h2>8. Mirror Mode for Teleprompter Glass Rigs</h2>
+          <p>
+            When utilizing professional beam-splitter hardware rigs or 70/30 teleprompter glass in studio setups, NotchFlow includes horizontal reflection mirroring. This reverses the rendering pipeline along the vertical axis so text appears correct through reflection mirrors.
+          </p>
+        </section>
+
+        <section class="feature-block">
+          <h2>9. 100% On-Device Privacy & Offline Operation</h2>
+          <p>
+            Audio captured by NotchFlow is transcribed strictly on your local Apple Neural Engine and CPU cores. No audio streams, transcript fragments, or script contents are transmitted across networks or stored on external servers. You can run presentations in full airplane mode with complete confidence.
+          </p>
+        </section>
+
+        <section class="content-section" style="border-top: 1px solid var(--color-border-weak);">
+          <div class="prose">
+            <h3>Explore Documentation & Setup</h3>
+            <p>
+              Ready to configure NotchFlow on your Mac? Check our <a href="/docs/installation">Installation Guide</a>, view <a href="/docs/how-to-use">Step-by-Step Usage Instructions</a>, or read our <a href="/faq">Frequently Asked Questions</a>.
+            </p>
+          </div>
+        </section>
+      </div>
+
+      <!-- Footer -->
+      <footer data-component="footer">
+        <div data-slot="cell"><a href="/features">Features</a></div>
+        <div data-slot="cell"><a href="/docs">Docs</a></div>
+        <div data-slot="cell"><a href="/blog">Blog</a></div>
+        <div data-slot="cell"><a href="/faq">FAQ</a></div>
+        <div data-slot="cell"><a href="/about">About</a></div>
+      </footer>
+
+      <!-- Legal & Copyright Bar -->
+      <div data-component="legal">
+        <span>&copy; 2026 NotchFlow</span>
+        <a href="/privacy-policy">Privacy Policy</a>
+        <a href="/terms">Terms</a>
+        <a href="/contact">Contact</a>
+        <a href="https://github.com/Nightkilller/NotchFlow" target="_blank" rel="noopener">GitHub</a>
+      </div>
+
+      <!-- Subtle Patent-Style Watermark -->
+      <div class="patent-watermark">
+        <span>Created by Aditya Gupta with 🧠</span>
+      </div>
+    </div>
+
+    <script>
+      const t = document.getElementById('mobileMenuToggle');
+      const m = document.getElementById('mobileMenu');
+      if (t && m) {
+        t.addEventListener('click', () => m.classList.toggle('active'));
+        m.querySelectorAll('a').forEach(a => a.addEventListener('click', () => m.classList.remove('active')));
+      }
+    </script>
+  </body>
+</html>
